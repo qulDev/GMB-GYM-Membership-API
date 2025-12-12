@@ -41,3 +41,5 @@ prisma/migrations/dev.db-journal
 .cache/
 
 /src/generated/prisma
+
+.idea

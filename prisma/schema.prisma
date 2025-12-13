@@ -5,10 +5,203 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// User Model
+model User {
+  id               String         @id @default(cuid())
+  email            String         @unique
+  password         String
+  fullName         String
+  phone            String
+  dateOfBirth      DateTime?
+  gender           Gender?
+  address          String?
+  emergencyContact String?
+  role             UserRole       @default(USER)
+  status           UserStatus     @default(ACTIVE)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  subscriptions    Subscription[]
+  payments         Payment[]
+  checkIns         CheckIn[]
+  classBookings    ClassBooking[]
+
+  @@map("users")
+}
+
+// Membership Plan Model
+model MembershipPlan {
+  id                 String         @id @default(cuid())
+  name               String
+  description        String?
+  duration           Int            // Duration in days
+  price              Decimal        @db.Decimal(10, 2)
+  features           String[]       // Array of features
+  maxCheckInsPerDay  Int            @default(1)
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  subscriptions      Subscription[]
+
+  @@map("membership_plans")
+}
+
+// Subscription Model
+model Subscription {
+  id               String             @id @default(cuid())
+  userId           String
+  membershipPlanId String
+  startDate        DateTime?
+  endDate          DateTime?
+  status           SubscriptionStatus @default(PENDING)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membershipPlan   MembershipPlan     @relation(fields: [membershipPlanId], references: [id], onDelete: Restrict)
+  payments         Payment[]
+
+  @@map("subscriptions")
+}
+
+// Payment Model
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String
+  subscriptionId        String
+  amount                Decimal       @db.Decimal(10, 2)
+  paymentMethod         String?
+  status                PaymentStatus @default(PENDING)
+  midtransOrderId       String?       @unique
+  midtransTransactionId String?
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+// Check-In Model
+model CheckIn {
+  id           String    @id @default(cuid())
+  userId       String
+  checkInTime  DateTime  @default(now())
+  checkOutTime DateTime?
+  duration     Int?      // Duration in minutes
+  createdAt    DateTime  @default(now())
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("check_ins")
+}
+
+// Trainer Model
+model Trainer {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  phone          String?
+  specialization String[]  // Array of specializations
+  bio            String?
+  certifications String[]  // Array of certifications
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  classes        GymClass[]
+
+  @@map("trainers")
+}
+
+// Gym Class Model
+model GymClass {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  trainerId   String
+  schedule    DateTime
+  duration    Int             // Duration in minutes
+  capacity    Int
+  bookedCount Int             @default(0)
+  type        String?
+  status      ClassStatus     @default(SCHEDULED)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  trainer     Trainer         @relation(fields: [trainerId], references: [id], onDelete: Restrict)
+  bookings    ClassBooking[]
+
+  @@map("gym_classes")
+}
+
+// Class Booking Model (Many-to-Many relationship)
+model ClassBooking {
+  id        String   @id @default(cuid())
+  userId    String
+  classId   String
+  bookedAt  DateTime @default(now())
+  status    BookingStatus @default(CONFIRMED)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gymClass  GymClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
+  @@map("class_bookings")
+}
+
+// Enums
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum ClassStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
 }

@@ -33,6 +33,7 @@ model User {
   payments         Payment[]
   checkIns         CheckIn[]
   classBookings    ClassBooking[]
+  logs             Log[]
 
   @@map("users")
 }
@@ -161,6 +162,25 @@ model ClassBooking {
   @@map("class_bookings")
 }
 
+// Logs Model
+model Log {
+  id          String    @id @default(cuid())
+  userId      String?
+  action      String    // Action performed (e.g., LOGIN, LOGOUT, CREATE_SUBSCRIPTION, etc.)
+  entity      String?   // Entity affected (e.g., USER, PAYMENT, SUBSCRIPTION)
+  entityId    String?   // ID of the entity affected
+  description String?
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?     // Additional data in JSON format
+  level       LogLevel  @default(INFO)
+  createdAt   DateTime  @default(now())
+
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("logs")
+}
+
 // Enums
 enum Gender {
   MALE
@@ -204,4 +224,11 @@ enum ClassStatus {
 enum BookingStatus {
   CONFIRMED
   CANCELLED
+}
+
+enum LogLevel {
+  INFO
+  WARNING
+  ERROR
+  DEBUG
 }

@@ -1,7 +1,7 @@
 {
   "name": "gmb",
   "version": "1.0.0",
-  "description": "Backend application with Express TypeScript, Prisma PostgreSQL, Midtrans, and Redis",
+  "description": "Backend application with Express TypeScript, Prisma PostgreSQL,zod, Midtrans, and Redis",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon",
@@ -51,6 +51,7 @@
     "helmet": "^8.1.0",
     "ioredis": "^5.8.2",
     "midtrans-client": "^1.4.3",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "zod": "^4.2.1"
   }
 }

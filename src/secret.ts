@@ -19,3 +19,7 @@ export const _MIDTRANS_IS_PRODUCTION =
 
 // jwt
 export const _JWTSECRET = process.env.JWT_SECRET;
+export const _JWT_ACCESS_EXPIRES_IN =
+  process.env.JWT_ACCESS_EXPIRES_IN || "15m";
+export const _JWT_REFRESH_EXPIRES_IN =
+  process.env.JWT_REFRESH_EXPIRES_IN || "7d";

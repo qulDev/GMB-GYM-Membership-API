@@ -1,12 +1,16 @@
 // routes/api/auth.routes.ts
-import { Express, Router } from "express";
-// import { login, register, GoogleValidate } from "../../controller/auth.controller";
+import { Router } from "express";
+import { AuthController } from "../../controllers";
+import { authenticate } from "../../middlewares";
 
-const authRoutes:Router = Router()
+const authRoutes: Router = Router();
 
-  // authentication
-  // authRoutes.post("/register", register);
-  // authRoutes.post("/login", login);
-  // authRoutes.post("/google/validate", GoogleValidate);
+// Public routes
+authRoutes.post("/register", AuthController.register);
+authRoutes.post("/login", AuthController.login);
+authRoutes.post("/refresh", AuthController.refresh);
+
+// Protected routes
+authRoutes.post("/logout", authenticate, AuthController.logout);
 
 export default authRoutes;

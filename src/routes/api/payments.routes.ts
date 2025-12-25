@@ -6,7 +6,7 @@ import { authenticate } from "../../middlewares";
 const paymentsRoutes: Router = Router();
 
 // webhook
-paymentsRoutes.post("/midtrans/notification", PaymentController.midtransNotification);
+paymentsRoutes.post("/webhook/midtrans", PaymentController.midtransNotification);
 
 // All routes require authentication
 paymentsRoutes.use(authenticate);

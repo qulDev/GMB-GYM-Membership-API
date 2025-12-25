@@ -29,7 +29,7 @@ export class PaymentController {
   }
 
   await PaymentService.handleNotification(n);
-  return res.json({ status: "OK" });
+  return ResponseHelper.success(res, 200);
 }
 
   

@@ -21,7 +21,7 @@ app.use(compression());
 app.use(morgan("dev"));
 
 // Body parsing
-app.use("/api/v1/payments/midtrans/notification",
+app.use("/api/v1/payments/webhook/midtrans",
   express.raw({ type: "*/*" })
 );
 app.use(express.urlencoded({ extended: true }));

@@ -43,3 +43,6 @@ prisma/migrations/dev.db-journal
 /src/generated/prisma
 
 .idea
+
+
+/docs/deskripsi-project

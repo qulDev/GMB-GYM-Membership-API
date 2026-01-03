@@ -4,3 +4,4 @@ export * from "./membership.service";
 export * from "./payments.service";
 export * from "./subscription.service";
 export * from "./checkin.service";
+export * from "./trainer.service";

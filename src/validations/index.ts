@@ -4,3 +4,5 @@ export * from "./membership.validation";
 export * from "./payments.validation";
 export * from "./checkin.validation";
 export * from "./trainer.validation";
+export * from "./reports.validation";
+export * from "./logs.validation";

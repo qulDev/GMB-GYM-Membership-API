@@ -8,6 +8,8 @@ import paymentsRoutes from "./api/payments.routes";
 import checkInRoutes from "./api/checkin.routes";
 import trainerRoutes from "./api/trainer.routes";
 import classRoutes from "./api/class.routes";
+import reportsRoutes from "./api/reports.routes";
+import logsRoutes from "./api/logs.routes";
 
 const rootRoutes: Router = Router();
 
@@ -20,5 +22,7 @@ rootRoutes.use("/v1/payments", paymentsRoutes);
 rootRoutes.use("/v1/check-ins", checkInRoutes);
 rootRoutes.use("/v1/trainers", trainerRoutes);
 rootRoutes.use("/v1/classes", classRoutes);
+rootRoutes.use("/v1/reports", reportsRoutes);
+rootRoutes.use("/v1/logs", logsRoutes);
 
 export default rootRoutes;

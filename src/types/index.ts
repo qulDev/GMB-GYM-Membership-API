@@ -6,3 +6,5 @@ export * from "./subscription.types";
 export * from "./payments.types";
 export * from "./checkin.types";
 export * from "./trainer.types";
+export * from "./reports.types";
+export * from "./logs.types";

@@ -5,3 +5,4 @@ export * from "./subscription.controller";
 export * from "./payments.controller";
 export * from "./checkin.controller";
 export * from "./trainer.controller";
+export * from "./reports.controller";

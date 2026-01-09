@@ -2624,13 +2624,18 @@
             "type": "object",
             "properties": {
               "data": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Log"
+                "type": "object",
+                "properties": {
+                  "logs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Log"
+                    }
+                  },
+                  "pagination": {
+                    "$ref": "#/components/schemas/Pagination"
+                  }
                 }
-              },
-              "pagination": {
-                "$ref": "#/components/schemas/Pagination"
               }
             }
           }

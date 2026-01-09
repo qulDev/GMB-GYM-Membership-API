@@ -10,7 +10,7 @@ import { errorHandler, notFoundHandler } from "./middlewares";
 const app: Express = express();
 
 // port
-const port = _PORT || 3000;
+const port = _PORT ? parseInt(_PORT, 10) : 3000;
 
 // Security middlewares
 app.use(helmet());

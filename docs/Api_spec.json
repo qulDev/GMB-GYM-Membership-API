@@ -59,6 +59,10 @@
     {
       "name": "Logs",
       "description": "System logs and activity tracking"
+    },
+    {
+      "name": "Member Dashboard",
+      "description": "Member dashboard for personalized information"
     }
   ],
   "paths": {
@@ -499,7 +503,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "duration", "price"],
+                "required": ["name", "duration", "price", "features"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -743,7 +747,7 @@
         }
       }
     },
-    "/api/v1/subscriptions/active": {
+    "/api/v1/subscriptions/current": {
       "get": {
         "tags": ["Subscriptions"],
         "summary": "Get current active subscription",
@@ -772,14 +776,43 @@
         }
       }
     },
-    "/api/v1/subscriptions/{subscriptionId}/cancel": {
+    "/api/v1/subscriptions/{id}/activate": {
       "post": {
         "tags": ["Subscriptions"],
-        "summary": "Cancel subscription",
+        "summary": "Activate subscription (Admin only)",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
-            "name": "subscriptionId",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSubscription"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/{id}/cancel": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Cancel subscription (Admin only)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -867,40 +900,23 @@
         }
       }
     },
-    "/api/v1/payments/{paymentId}/process": {
+    "/api/v1/payments/{subscriptionId}": {
       "post": {
         "tags": ["Payments"],
         "summary": "Process payment with Midtrans",
-        "description": "Create Midtrans payment transaction",
+        "description": "Create Midtrans Snap payment transaction for a subscription",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
-            "name": "paymentId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The subscription ID to process payment for"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["paymentMethod"],
-                "properties": {
-                  "paymentMethod": {
-                    "type": "string",
-                    "enum": ["credit_card", "bank_transfer", "gopay", "qris"],
-                    "example": "gopay"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Payment token created",
@@ -1063,12 +1079,21 @@
         "summary": "Get gym classes",
         "parameters": [
           {
-            "name": "date",
+            "name": "status",
             "in": "query",
             "schema": {
               "type": "string",
-              "format": "date"
-            }
+              "enum": ["SCHEDULED", "ONGOING", "COMPLETED", "CANCELLED"]
+            },
+            "description": "Filter by class status"
+          },
+          {
+            "name": "trainerId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by trainer ID"
           },
           {
             "name": "type",
@@ -1077,6 +1102,14 @@
               "type": "string"
             },
             "description": "Class type (yoga, boxing, cardio, etc)"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by class name"
           }
         ],
         "responses": {
@@ -1102,7 +1135,13 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "trainerId", "schedule", "capacity"],
+                "required": [
+                  "name",
+                  "trainerId",
+                  "schedule",
+                  "duration",
+                  "capacity"
+                ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1120,7 +1159,8 @@
                   },
                   "duration": {
                     "type": "integer",
-                    "description": "Duration in minutes",
+                    "description": "Duration in minutes (minimum 10)",
+                    "minimum": 10,
                     "example": 60
                   },
                   "capacity": {
@@ -1150,18 +1190,19 @@
         }
       }
     },
-    "/api/v1/classes/{classId}": {
+    "/api/v1/classes/{id}": {
       "get": {
         "tags": ["Classes"],
         "summary": "Get class details",
         "parameters": [
           {
-            "name": "classId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Class ID (CUID format)"
           }
         ],
         "responses": {
@@ -1183,12 +1224,13 @@
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
-            "name": "classId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Class ID (CUID format)"
           }
         ],
         "requestBody": {
@@ -1198,8 +1240,15 @@
                 "type": "object",
                 "properties": {
                   "name": { "type": "string" },
+                  "description": { "type": "string" },
                   "schedule": { "type": "string", "format": "date-time" },
-                  "capacity": { "type": "integer" }
+                  "duration": { "type": "integer", "minimum": 10 },
+                  "capacity": { "type": "integer" },
+                  "type": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["SCHEDULED", "ONGOING", "COMPLETED", "CANCELLED"]
+                  }
                 }
               }
             }
@@ -1224,12 +1273,13 @@
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
-            "name": "classId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Class ID (CUID format)"
           }
         ],
         "responses": {
@@ -1246,78 +1296,36 @@
         }
       }
     },
-    "/api/v1/classes/{classId}/book": {
-      "post": {
-        "tags": ["Classes"],
-        "summary": "Book a class",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "classId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Class booked successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseMessage"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Class is full or already booked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/classes/{classId}/cancel": {
-      "post": {
-        "tags": ["Classes"],
-        "summary": "Cancel class booking",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "classId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Booking cancelled",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseMessage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/trainers": {
       "get": {
         "tags": ["Trainers"],
         "summary": "Get all trainers",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by trainer name"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by specialization"
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Trainers list",
@@ -1341,7 +1349,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "specialization"],
+                "required": ["name", "email", "specialization"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -1786,6 +1794,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResponseMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/member/dashboard": {
+      "get": {
+        "tags": ["Member Dashboard"],
+        "summary": "Get member dashboard",
+        "description": "Retrieve personalized dashboard for authenticated member including subscription info, recommended classes, check-in stats, upcoming booked classes, and recent activity",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Member dashboard retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMemberDashboard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
                 }
               }
             }
@@ -2471,7 +2509,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["scheduled", "ongoing", "completed", "cancelled"]
+            "enum": ["SCHEDULED", "ONGOING", "COMPLETED", "CANCELLED"]
           },
           "createdAt": {
             "type": "string",
@@ -2624,13 +2662,234 @@
             "type": "object",
             "properties": {
               "data": {
+                "type": "object",
+                "properties": {
+                  "logs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Log"
+                    }
+                  },
+                  "pagination": {
+                    "$ref": "#/components/schemas/Pagination"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SubscriptionSummary": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "daysRemaining": {
+            "type": "integer"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "maxCheckInsPerDay": {
+            "type": "integer"
+          }
+        }
+      },
+      "MemberCheckInStats": {
+        "type": "object",
+        "properties": {
+          "totalCheckIns": {
+            "type": "integer"
+          },
+          "thisMonthCheckIns": {
+            "type": "integer"
+          },
+          "todayCheckIns": {
+            "type": "integer"
+          },
+          "remainingCheckInsToday": {
+            "type": "integer"
+          },
+          "averageDurationMinutes": {
+            "type": "integer"
+          }
+        }
+      },
+      "RecommendedClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "schedule": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in minutes"
+          },
+          "capacity": {
+            "type": "integer"
+          },
+          "bookedCount": {
+            "type": "integer"
+          },
+          "availableSlots": {
+            "type": "integer"
+          },
+          "trainer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "specialization": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/Log"
+                  "type": "string"
                 }
+              }
+            }
+          },
+          "isBookable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BookedClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "bookingId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "schedule": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trainer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
               },
-              "pagination": {
-                "$ref": "#/components/schemas/Pagination"
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "RecentCheckIn": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "duration": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Duration in minutes"
+          }
+        }
+      },
+      "MemberDashboard": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionSummary"
+          },
+          "checkInStats": {
+            "$ref": "#/components/schemas/MemberCheckInStats"
+          },
+          "recommendedClasses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecommendedClass"
+            }
+          },
+          "upcomingBookedClasses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookedClass"
+            }
+          },
+          "recentActivity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentCheckIn"
+            }
+          }
+        }
+      },
+      "ResponseMemberDashboard": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MemberDashboard"
               }
             }
           }

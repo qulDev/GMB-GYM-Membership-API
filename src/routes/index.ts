@@ -10,6 +10,7 @@ import trainerRoutes from "./api/trainer.routes";
 import classRoutes from "./api/class.routes";
 import reportsRoutes from "./api/reports.routes";
 import logsRoutes from "./api/logs.routes";
+import memberDashboardRoutes from "./api/member-dashboard.routes";
 
 const rootRoutes: Router = Router();
 
@@ -24,5 +25,6 @@ rootRoutes.use("/v1/trainers", trainerRoutes);
 rootRoutes.use("/v1/classes", classRoutes);
 rootRoutes.use("/v1/reports", reportsRoutes);
 rootRoutes.use("/v1/logs", logsRoutes);
+rootRoutes.use("/v1/member", memberDashboardRoutes);
 
 export default rootRoutes;

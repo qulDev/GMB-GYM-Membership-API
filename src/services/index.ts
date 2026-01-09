@@ -8,3 +8,4 @@ export * from "./trainer.service";
 export * from "./class.service";
 export * from "./reports.service";
 export * from "./logs.service";
+export * from "./member-dashboard.service";

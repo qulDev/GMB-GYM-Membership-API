@@ -8,3 +8,4 @@ export * from "./checkin.types";
 export * from "./trainer.types";
 export * from "./reports.types";
 export * from "./logs.types";
+export * from "./member-dashboard.types";

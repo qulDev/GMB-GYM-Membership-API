@@ -7,3 +7,4 @@ export * from "./checkin.controller";
 export * from "./trainer.controller";
 export * from "./reports.controller";
 export * from "./logs.controller";
+export * from "./member-dashboard.controller";

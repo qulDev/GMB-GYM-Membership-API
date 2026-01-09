@@ -59,6 +59,10 @@
     {
       "name": "Logs",
       "description": "System logs and activity tracking"
+    },
+    {
+      "name": "Member Dashboard",
+      "description": "Member dashboard for personalized information"
     }
   ],
   "paths": {
@@ -1796,6 +1800,36 @@
           }
         }
       }
+    },
+    "/api/v1/member/dashboard": {
+      "get": {
+        "tags": ["Member Dashboard"],
+        "summary": "Get member dashboard",
+        "description": "Retrieve personalized dashboard for authenticated member including subscription info, recommended classes, check-in stats, upcoming booked classes, and recent activity",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Member dashboard retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMemberDashboard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2640,6 +2674,222 @@
                     "$ref": "#/components/schemas/Pagination"
                   }
                 }
+              }
+            }
+          }
+        ]
+      },
+      "SubscriptionSummary": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "daysRemaining": {
+            "type": "integer"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "maxCheckInsPerDay": {
+            "type": "integer"
+          }
+        }
+      },
+      "MemberCheckInStats": {
+        "type": "object",
+        "properties": {
+          "totalCheckIns": {
+            "type": "integer"
+          },
+          "thisMonthCheckIns": {
+            "type": "integer"
+          },
+          "todayCheckIns": {
+            "type": "integer"
+          },
+          "remainingCheckInsToday": {
+            "type": "integer"
+          },
+          "averageDurationMinutes": {
+            "type": "integer"
+          }
+        }
+      },
+      "RecommendedClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "schedule": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in minutes"
+          },
+          "capacity": {
+            "type": "integer"
+          },
+          "bookedCount": {
+            "type": "integer"
+          },
+          "availableSlots": {
+            "type": "integer"
+          },
+          "trainer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "specialization": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "isBookable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BookedClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "bookingId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "schedule": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "trainer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "RecentCheckIn": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "duration": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Duration in minutes"
+          }
+        }
+      },
+      "MemberDashboard": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionSummary"
+          },
+          "checkInStats": {
+            "$ref": "#/components/schemas/MemberCheckInStats"
+          },
+          "recommendedClasses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecommendedClass"
+            }
+          },
+          "upcomingBookedClasses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookedClass"
+            }
+          },
+          "recentActivity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentCheckIn"
+            }
+          }
+        }
+      },
+      "ResponseMemberDashboard": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MemberDashboard"
               }
             }
           }

@@ -3,7 +3,20 @@ import { AuthController } from "../auth.controller";
 import { AuthService, AuthServiceError } from "../../services/auth.service";
 import { ResponseHelper } from "../../utils/response.helper";
 
-jest.mock("../../services/auth.service");
+// Mock only the AuthService class methods, keep AuthServiceError as real implementation
+jest.mock("../../services/auth.service", () => {
+  const actual = jest.requireActual("../../services/auth.service");
+  return {
+    ...actual,
+    AuthService: {
+      register: jest.fn(),
+      login: jest.fn(),
+      refreshToken: jest.fn(),
+      logout: jest.fn(),
+      getProfile: jest.fn(),
+    },
+  };
+});
 
 describe("AuthController", () => {
   let mockRequest: Partial<Request>;

@@ -1,4 +1,5 @@
 import { MemberDashboardRepository } from "../models";
+import { redis } from "../config/redis.config";
 import {
   MemberDashboardStats,
   SubscriptionSummary,
@@ -7,6 +8,10 @@ import {
   BookedClass,
   RecentCheckIn,
 } from "../types";
+
+// Redis cache configuration
+const CACHE_PREFIX = "member_dashboard:";
+const CACHE_TTL_SECONDS = 60; // 1 minute cache TTL
 
 export class MemberDashboardServiceError extends Error {
   constructor(
@@ -20,12 +25,74 @@ export class MemberDashboardServiceError extends Error {
 
 export class MemberDashboardService {
   /**
+   * Get cache key for user dashboard
+   */
+  private static getCacheKey(userId: string): string {
+    return `${CACHE_PREFIX}${userId}`;
+  }
+
+  /**
+   * Get cached dashboard data
+   */
+  private static async getCachedDashboard(
+    userId: string
+  ): Promise<MemberDashboardStats | null> {
+    try {
+      const cached = await redis.get(this.getCacheKey(userId));
+      if (cached) {
+        return JSON.parse(cached) as MemberDashboardStats;
+      }
+      return null;
+    } catch {
+      // If cache read fails, return null to fetch fresh data
+      return null;
+    }
+  }
+
+  /**
+   * Set dashboard data in cache
+   */
+  private static async setCachedDashboard(
+    userId: string,
+    data: MemberDashboardStats
+  ): Promise<void> {
+    try {
+      await redis.setex(
+        this.getCacheKey(userId),
+        CACHE_TTL_SECONDS,
+        JSON.stringify(data)
+      );
+    } catch {
+      // If cache write fails, just log and continue (non-critical)
+      console.error("Failed to cache member dashboard data");
+    }
+  }
+
+  /**
+   * Invalidate dashboard cache for a user
+   */
+  static async invalidateCache(userId: string): Promise<void> {
+    try {
+      await redis.del(this.getCacheKey(userId));
+    } catch {
+      // If cache invalidation fails, just log and continue
+      console.error("Failed to invalidate member dashboard cache");
+    }
+  }
+
+  /**
    * Get member dashboard statistics
    */
   static async getDashboardStats(
     userId: string
   ): Promise<MemberDashboardStats> {
     try {
+      // Try to get from cache first
+      const cachedData = await this.getCachedDashboard(userId);
+      if (cachedData) {
+        return cachedData;
+      }
+
       // Fetch all dashboard data in parallel for better performance
       const [
         subscription,
@@ -80,13 +147,18 @@ export class MemberDashboardService {
       const processedRecentActivity =
         this.processRecentActivity(recentActivity);
 
-      return {
+      const dashboardStats: MemberDashboardStats = {
         subscription: subscriptionSummary,
         checkInStats,
         recommendedClasses: processedRecommendedClasses,
         upcomingBookedClasses: processedBookedClasses,
         recentActivity: processedRecentActivity,
       };
+
+      // Cache the result for future requests
+      await this.setCachedDashboard(userId, dashboardStats);
+
+      return dashboardStats;
     } catch (error) {
       if (error instanceof MemberDashboardServiceError) {
         throw error;

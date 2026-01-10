@@ -17,6 +17,40 @@
   ],
   "item": [
     {
+      "name": "Documentation",
+      "description": "API Documentation endpoints",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api-docs"]
+            },
+            "description": "Interactive API documentation with Swagger UI. Open this URL in a browser to explore and test all API endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the API server is running and healthy"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Authentication",
       "description": "User authentication and authorization endpoints",
       "item": [

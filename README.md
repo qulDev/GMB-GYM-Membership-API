@@ -316,6 +316,21 @@ npm start
 
 ## 📖 API Documentation
 
+### Swagger UI
+
+Dokumentasi API interaktif tersedia melalui Swagger UI:
+
+```
+http://localhost:3000/api-docs
+```
+
+Swagger UI memungkinkan Anda untuk:
+
+- Melihat semua endpoint API
+- Mencoba request langsung dari browser
+- Melihat schema request/response
+- Test autentikasi dengan JWT token
+
 ### Base URL
 
 ```
@@ -396,6 +411,8 @@ Dokumentasi API lengkap tersedia dalam format OpenAPI 3.0:
 ```
 docs/Api_spec.json
 ```
+
+Atau akses langsung via Swagger UI di `http://localhost:3000/api-docs`
 
 ---
 

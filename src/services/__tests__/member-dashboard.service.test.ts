@@ -17,6 +17,14 @@ jest.mock("../../models", () => ({
   },
 }));
 
+jest.mock("../../config/redis.config", () => ({
+  redis: {
+    get: jest.fn().mockResolvedValue(null),
+    setex: jest.fn().mockResolvedValue("OK"),
+    del: jest.fn().mockResolvedValue(1),
+  },
+}));
+
 describe("MemberDashboardService", () => {
   const mockUserId = "user123";
 

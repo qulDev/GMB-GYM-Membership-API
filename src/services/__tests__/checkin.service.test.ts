@@ -16,6 +16,12 @@ jest.mock("../../models", () => ({
   },
 }));
 
+jest.mock("../member-dashboard.service", () => ({
+  MemberDashboardService: {
+    invalidateCache: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
 describe("CheckInService", () => {
   // Use dynamic dates to ensure they're always valid
   const futureDate = new Date();

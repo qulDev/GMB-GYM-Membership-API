@@ -1,4 +1,5 @@
 import { CheckInRepository, SubscriptionRepository } from "../models";
+import { MemberDashboardService } from "./member-dashboard.service";
 
 export class CheckInService {
   /**
@@ -55,7 +56,12 @@ export class CheckInService {
     }
 
     // 5. Create check-in
-    return CheckInRepository.create(userId);
+    const checkInResult = await CheckInRepository.create(userId);
+
+    // Invalidate dashboard cache after check-in
+    await MemberDashboardService.invalidateCache(userId);
+
+    return checkInResult;
   }
 
   /**
@@ -87,7 +93,16 @@ export class CheckInService {
     const durationMinutes = Math.round(durationMs / (1000 * 60));
 
     // 4. Update check-in with checkout info
-    return CheckInRepository.checkout(checkInId, checkOutTime, durationMinutes);
+    const checkOutResult = await CheckInRepository.checkout(
+      checkInId,
+      checkOutTime,
+      durationMinutes
+    );
+
+    // Invalidate dashboard cache after check-out
+    await MemberDashboardService.invalidateCache(userId);
+
+    return checkOutResult;
   }
 
   /**

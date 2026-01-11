@@ -161,4 +161,20 @@ export class SubscriptionRepository {
       data: { status: SubscriptionStatus.CANCELLED },
     });
   }
+
+  /**
+   * Find subscription by ID and User ID for ownership validation
+   * Returns null if subscription doesn't exist or doesn't belong to user
+   */
+  static findByIdAndUser(id: string, userId: string) {
+    return prisma.subscription.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      include: {
+        membershipPlan: true,
+      },
+    });
+  }
 }

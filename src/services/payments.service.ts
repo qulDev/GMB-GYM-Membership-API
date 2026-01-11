@@ -3,10 +3,17 @@ import { PaymentRepository, SubscriptionRepository } from "../models";
 import { Prisma } from "../generated/prisma";
 
 export class PaymentService {
-
   static async createSnapPayment(userId: string, subscriptionId: string) {
-    const subscription = await SubscriptionRepository.findById(subscriptionId);
-    if (!subscription) throw new Error("Subscription not found");
+    // Validate subscription ownership - user can only pay for their own subscription
+    const subscription = await SubscriptionRepository.findByIdAndUser(
+      subscriptionId,
+      userId
+    );
+    if (!subscription) {
+      const error = new Error("Subscription not found or access denied");
+      (error as any).statusCode = 404;
+      throw error;
+    }
 
     const amount = subscription.membershipPlan.price.toNumber();
     const orderId = `GYM-${Date.now()}-${subscription.id}`;
@@ -29,18 +36,16 @@ export class PaymentService {
     return {
       snapToken: snapResponse.token,
       redirectUrl: snapResponse.redirect_url,
-      paymentId: payment.id
+      paymentId: payment.id,
     };
   }
 
   // Webhook
   static async handleNotification(n: any) {
-
     const payment = await PaymentRepository.findByOrderId(n.order_id);
     if (!payment) return;
 
     if (n.transaction_status === "settlement") {
-
       // 1. Mark payment PAID
       await PaymentRepository.markPaid(payment.id, n.transaction_id);
 
@@ -57,11 +62,11 @@ export class PaymentService {
       await SubscriptionRepository.update(sub.id, {
         status: "ACTIVE",
         startDate: start,
-        endDate: end
+        endDate: end,
       });
     }
 
-    if (["deny","cancel","expire"].includes(n.transaction_status)) {
+    if (["deny", "cancel", "expire"].includes(n.transaction_status)) {
       await PaymentRepository.markFailed(payment.id);
     }
   }
@@ -70,7 +75,19 @@ export class PaymentService {
     return PaymentRepository.findByUser(userId);
   }
 
-  static getDetail(id: string) {
-    return PaymentRepository.findById(id);
+  /**
+   * Get payment detail with ownership validation
+   * User can only view their own payment details
+   */
+  static async getDetail(id: string, userId: string) {
+    const payment = await PaymentRepository.findByIdAndUser(id, userId);
+
+    if (!payment) {
+      const error = new Error("Payment not found or access denied");
+      (error as any).statusCode = 404;
+      throw error;
+    }
+
+    return payment;
   }
 }

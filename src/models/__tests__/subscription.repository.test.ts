@@ -384,4 +384,65 @@ describe("SubscriptionRepository", () => {
       });
     });
   });
+
+  describe("findByIdAndUser", () => {
+    it("should find subscription by ID and user ID with membership plan", async () => {
+      const subscriptionId = "subscription123";
+      const userId = "user123";
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(
+        mockSubscriptionWithPlan
+      );
+
+      const result = await SubscriptionRepository.findByIdAndUser(
+        subscriptionId,
+        userId
+      );
+
+      expect(result).toEqual(mockSubscriptionWithPlan);
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: subscriptionId,
+          userId: userId,
+        },
+        include: {
+          membershipPlan: true,
+        },
+      });
+    });
+
+    it("should return null if subscription not found", async () => {
+      const subscriptionId = "nonexistent";
+      const userId = "user123";
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await SubscriptionRepository.findByIdAndUser(
+        subscriptionId,
+        userId
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it("should return null if subscription belongs to different user", async () => {
+      const subscriptionId = "subscription123";
+      const userId = "different-user";
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await SubscriptionRepository.findByIdAndUser(
+        subscriptionId,
+        userId
+      );
+
+      expect(result).toBeNull();
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: subscriptionId,
+          userId: userId,
+        },
+        include: {
+          membershipPlan: true,
+        },
+      });
+    });
+  });
 });

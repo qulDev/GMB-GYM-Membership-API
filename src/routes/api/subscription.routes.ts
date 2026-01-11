@@ -9,6 +9,7 @@ const router = Router();
 router.use(authenticate);
 router.post("/", SubscriptionController.create);
 router.get("/current", SubscriptionController.current);
+router.post("/current/cancel", SubscriptionController.cancelMy);
 
 // ADMIN
 router.get("/", authorize("ADMIN"), SubscriptionController.getAll);

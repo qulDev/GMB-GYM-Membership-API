@@ -776,6 +776,111 @@
         }
       }
     },
+    "/api/v1/subscriptions/current/cancel": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Cancel current subscription (User)",
+        "description": "Allows authenticated users to cancel their own active subscription. Only ACTIVE subscriptions can be cancelled. PENDING subscriptions require payment completion or support contact. EXPIRED subscriptions cannot be cancelled.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Your subscription has been cancelled successfully"
+                        },
+                        "subscription": {
+                          "$ref": "#/components/schemas/Subscription"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - subscription cannot be cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "BAD_REQUEST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription already canceled"
+                    }
+                  }
+                },
+                "examples": {
+                  "already_cancelled": {
+                    "summary": "Already cancelled",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Subscription already canceled"
+                    }
+                  },
+                  "expired": {
+                    "summary": "Expired subscription",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Cannot cancel an expired subscription"
+                    }
+                  },
+                  "pending": {
+                    "summary": "Pending subscription",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Cannot cancel a pending subscription. Please wait for payment confirmation or contact support."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - user not authenticated"
+          },
+          "404": {
+            "description": "No active subscription found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/subscriptions/{id}/activate": {
       "post": {
         "tags": ["Subscriptions"],

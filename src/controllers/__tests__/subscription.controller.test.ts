@@ -10,6 +10,7 @@ jest.mock("../../services", () => ({
     getAllSubscriptions: jest.fn(),
     activateSubscription: jest.fn(),
     cancelSubscription: jest.fn(),
+    cancelUserSubscription: jest.fn(),
   },
 }));
 
@@ -297,6 +298,148 @@ describe("SubscriptionController", () => {
       );
 
       await SubscriptionController.cancel(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("cancelMy", () => {
+    it("should cancel user's own subscription successfully", async () => {
+      const cancelledSub = { ...mockSubscription, status: "CANCELLED" };
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockResolvedValue(cancelledSub);
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(SubscriptionService.cancelUserSubscription).toHaveBeenCalledWith(
+        "user123"
+      );
+      expect(ResponseHelper.success).toHaveBeenCalledWith(
+        mockResponse,
+        {
+          message: "Your subscription has been cancelled successfully",
+          subscription: cancelledSub,
+        },
+        200
+      );
+    });
+
+    it("should return 401 if user not authenticated", async () => {
+      mockRequest.user = undefined;
+      jest.spyOn(ResponseHelper, "unauthorized");
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(ResponseHelper.unauthorized).toHaveBeenCalledWith(
+        mockResponse,
+        "User is not authenticated"
+      );
+    });
+
+    it("should return 404 if no active subscription found", async () => {
+      const error = new Error("No active subscription found");
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockRejectedValue(error);
+      jest.spyOn(ResponseHelper, "notFound");
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(ResponseHelper.notFound).toHaveBeenCalledWith(
+        mockResponse,
+        "No active subscription found"
+      );
+    });
+
+    it("should return 400 if subscription already cancelled", async () => {
+      const error = new Error("Subscription already canceled");
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockRejectedValue(error);
+      jest.spyOn(ResponseHelper, "error");
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(ResponseHelper.error).toHaveBeenCalledWith(
+        mockResponse,
+        "BAD_REQUEST",
+        "Subscription already canceled",
+        400
+      );
+    });
+
+    it("should return 400 if subscription is expired", async () => {
+      const error = new Error("Cannot cancel an expired subscription");
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockRejectedValue(error);
+      jest.spyOn(ResponseHelper, "error");
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(ResponseHelper.error).toHaveBeenCalledWith(
+        mockResponse,
+        "BAD_REQUEST",
+        "Cannot cancel an expired subscription",
+        400
+      );
+    });
+
+    it("should return 400 if subscription is pending", async () => {
+      const error = new Error(
+        "Cannot cancel a pending subscription. Please wait for payment confirmation or contact support."
+      );
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockRejectedValue(error);
+      jest.spyOn(ResponseHelper, "error");
+
+      await SubscriptionController.cancelMy(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(ResponseHelper.error).toHaveBeenCalledWith(
+        mockResponse,
+        "BAD_REQUEST",
+        "Cannot cancel a pending subscription. Please wait for payment confirmation or contact support.",
+        400
+      );
+    });
+
+    it("should call next on unexpected error", async () => {
+      const error = new Error("Unexpected error");
+      (
+        SubscriptionService.cancelUserSubscription as jest.Mock
+      ).mockRejectedValue(error);
+
+      await SubscriptionController.cancelMy(
         mockRequest as Request,
         mockResponse as Response,
         mockNext

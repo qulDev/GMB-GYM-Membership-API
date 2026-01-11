@@ -5,6 +5,7 @@ export * from "./payments.repository";
 export * from "./checkin.repository";
 export * from "./trainer.repository";
 export * from "./class.repository";
+export * from "./class-booking.repository";
 export * from "./reports.repository";
 export * from "./logs.repository";
 export * from "./member-dashboard.repository";

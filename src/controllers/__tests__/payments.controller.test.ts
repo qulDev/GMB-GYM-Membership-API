@@ -216,7 +216,7 @@ describe("PaymentController", () => {
   });
 
   describe("detail", () => {
-    it("should get payment detail successfully", async () => {
+    it("should get payment detail successfully with ownership validation", async () => {
       mockRequest.params = { id: "payment123" };
       (PaymentService.getDetail as jest.Mock).mockResolvedValue(mockPayment);
 
@@ -226,7 +226,10 @@ describe("PaymentController", () => {
         mockNext
       );
 
-      expect(PaymentService.getDetail).toHaveBeenCalledWith("payment123");
+      expect(PaymentService.getDetail).toHaveBeenCalledWith(
+        "payment123",
+        "user123"
+      );
       expect(ResponseHelper.success).toHaveBeenCalledWith(
         mockResponse,
         mockPayment,
@@ -234,9 +237,11 @@ describe("PaymentController", () => {
       );
     });
 
-    it("should return null if payment not found", async () => {
+    it("should call next with error if payment not found or access denied", async () => {
       mockRequest.params = { id: "nonexistent" };
-      (PaymentService.getDetail as jest.Mock).mockResolvedValue(null);
+      const error = new Error("Payment not found or access denied");
+      (error as any).statusCode = 404;
+      (PaymentService.getDetail as jest.Mock).mockRejectedValue(error);
 
       await PaymentController.detail(
         mockRequest as Request,
@@ -244,11 +249,7 @@ describe("PaymentController", () => {
         mockNext
       );
 
-      expect(ResponseHelper.success).toHaveBeenCalledWith(
-        mockResponse,
-        null,
-        200
-      );
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
 
     it("should call next on error", async () => {

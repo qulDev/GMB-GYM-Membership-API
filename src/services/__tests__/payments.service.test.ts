@@ -11,9 +11,11 @@ jest.mock("../../models", () => ({
     markFailed: jest.fn(),
     findByUser: jest.fn(),
     findById: jest.fn(),
+    findByIdAndUser: jest.fn(),
   },
   SubscriptionRepository: {
     findById: jest.fn(),
+    findByIdAndUser: jest.fn(),
     update: jest.fn(),
   },
 }));
@@ -64,7 +66,7 @@ describe("PaymentService", () => {
         redirect_url: "https://midtrans.com/redirect",
       };
 
-      (SubscriptionRepository.findById as jest.Mock).mockResolvedValue(
+      (SubscriptionRepository.findByIdAndUser as jest.Mock).mockResolvedValue(
         mockSubscription
       );
       (PaymentRepository.create as jest.Mock).mockResolvedValue(mockPayment);
@@ -80,8 +82,9 @@ describe("PaymentService", () => {
         redirectUrl: snapResponse.redirect_url,
         paymentId: mockPayment.id,
       });
-      expect(SubscriptionRepository.findById).toHaveBeenCalledWith(
-        "subscription123"
+      expect(SubscriptionRepository.findByIdAndUser).toHaveBeenCalledWith(
+        "subscription123",
+        "user123"
       );
       expect(PaymentRepository.create).toHaveBeenCalledWith({
         userId: "user123",
@@ -98,11 +101,30 @@ describe("PaymentService", () => {
     });
 
     it("should throw error if subscription not found", async () => {
-      (SubscriptionRepository.findById as jest.Mock).mockResolvedValue(null);
+      (SubscriptionRepository.findByIdAndUser as jest.Mock).mockResolvedValue(
+        null
+      );
 
       await expect(
         PaymentService.createSnapPayment("user123", "nonexistent")
-      ).rejects.toThrow("Subscription not found");
+      ).rejects.toThrow("Subscription not found or access denied");
+    });
+
+    it("should throw 404 error if user tries to pay for another user subscription", async () => {
+      (SubscriptionRepository.findByIdAndUser as jest.Mock).mockResolvedValue(
+        null
+      );
+
+      try {
+        await PaymentService.createSnapPayment(
+          "different-user",
+          "subscription123"
+        );
+        fail("Should have thrown error");
+      } catch (error: any) {
+        expect(error.message).toBe("Subscription not found or access denied");
+        expect(error.statusCode).toBe(404);
+      }
     });
   });
 
@@ -272,21 +294,53 @@ describe("PaymentService", () => {
   });
 
   describe("getDetail", () => {
-    it("should get payment details by ID", async () => {
-      (PaymentRepository.findById as jest.Mock).mockResolvedValue(mockPayment);
+    const mockPaymentWithSubscription = {
+      ...mockPayment,
+      subscription: {
+        id: "subscription123",
+        membershipPlan: {
+          id: "plan123",
+          name: "Premium",
+        },
+      },
+    };
 
-      const result = await PaymentService.getDetail("payment123");
+    it("should get payment details by ID and userId", async () => {
+      (PaymentRepository.findByIdAndUser as jest.Mock).mockResolvedValue(
+        mockPaymentWithSubscription
+      );
 
-      expect(result).toEqual(mockPayment);
-      expect(PaymentRepository.findById).toHaveBeenCalledWith("payment123");
+      const result = await PaymentService.getDetail("payment123", "user123");
+
+      expect(result).toEqual(mockPaymentWithSubscription);
+      expect(PaymentRepository.findByIdAndUser).toHaveBeenCalledWith(
+        "payment123",
+        "user123"
+      );
     });
 
-    it("should return null if payment not found", async () => {
-      (PaymentRepository.findById as jest.Mock).mockResolvedValue(null);
+    it("should throw 404 error if payment not found", async () => {
+      (PaymentRepository.findByIdAndUser as jest.Mock).mockResolvedValue(null);
 
-      const result = await PaymentService.getDetail("nonexistent");
+      try {
+        await PaymentService.getDetail("nonexistent", "user123");
+        fail("Should have thrown error");
+      } catch (error: any) {
+        expect(error.message).toBe("Payment not found or access denied");
+        expect(error.statusCode).toBe(404);
+      }
+    });
 
-      expect(result).toBeNull();
+    it("should throw 404 error if user tries to access another user payment", async () => {
+      (PaymentRepository.findByIdAndUser as jest.Mock).mockResolvedValue(null);
+
+      try {
+        await PaymentService.getDetail("payment123", "different-user");
+        fail("Should have thrown error");
+      } catch (error: any) {
+        expect(error.message).toBe("Payment not found or access denied");
+        expect(error.statusCode).toBe(404);
+      }
     });
   });
 });

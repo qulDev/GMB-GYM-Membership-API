@@ -7,6 +7,7 @@ jest.mock("../../config/database.config", () => ({
     payment: {
       create: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
     },
@@ -162,6 +163,78 @@ describe("PaymentRepository", () => {
       const result = await PaymentRepository.findById(paymentId);
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe("findByIdAndUser", () => {
+    const mockPaymentWithSubscription = {
+      ...mockPayment,
+      subscription: {
+        id: "subscription123",
+        membershipPlan: {
+          id: "plan123",
+          name: "Premium",
+          price: 500000,
+        },
+      },
+    };
+
+    it("should find payment by ID and user ID with subscription details", async () => {
+      const paymentId = "payment123";
+      const userId = "user123";
+      (prisma.payment.findFirst as jest.Mock).mockResolvedValue(
+        mockPaymentWithSubscription
+      );
+
+      const result = await PaymentRepository.findByIdAndUser(paymentId, userId);
+
+      expect(result).toEqual(mockPaymentWithSubscription);
+      expect(prisma.payment.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: paymentId,
+          userId: userId,
+        },
+        include: {
+          subscription: {
+            include: {
+              membershipPlan: true,
+            },
+          },
+        },
+      });
+    });
+
+    it("should return null if payment not found", async () => {
+      const paymentId = "nonexistent";
+      const userId = "user123";
+      (prisma.payment.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await PaymentRepository.findByIdAndUser(paymentId, userId);
+
+      expect(result).toBeNull();
+    });
+
+    it("should return null if payment belongs to different user", async () => {
+      const paymentId = "payment123";
+      const userId = "different-user";
+      (prisma.payment.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await PaymentRepository.findByIdAndUser(paymentId, userId);
+
+      expect(result).toBeNull();
+      expect(prisma.payment.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: paymentId,
+          userId: userId,
+        },
+        include: {
+          subscription: {
+            include: {
+              membershipPlan: true,
+            },
+          },
+        },
+      });
     });
   });
 });

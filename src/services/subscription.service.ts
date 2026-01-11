@@ -53,18 +53,49 @@ export class SubscriptionService {
 
   static async cancelSubscription(id: string) {
     const sub = await SubscriptionRepository.findById(id);
-  
+
     if (!sub) {
       throw new Error("Subscription not found");
     }
-  
+
     if (sub.status === SubscriptionStatus.CANCELLED) {
       throw new Error("Subscription already canceled");
     }
-  
+
     return SubscriptionRepository.update(id, {
       status: SubscriptionStatus.CANCELLED,
     });
   }
-  
+
+  /**
+   * Cancel user's own active subscription
+   * User can only cancel their own subscription
+   */
+  static async cancelUserSubscription(userId: string) {
+    // Find user's active subscription
+    const sub = await SubscriptionRepository.findActiveByUser(userId);
+
+    if (!sub) {
+      throw new Error("No active subscription found");
+    }
+
+    // Check if subscription is in a cancellable state
+    if (sub.status === SubscriptionStatus.CANCELLED) {
+      throw new Error("Subscription already canceled");
+    }
+
+    if (sub.status === SubscriptionStatus.EXPIRED) {
+      throw new Error("Cannot cancel an expired subscription");
+    }
+
+    if (sub.status === SubscriptionStatus.PENDING) {
+      throw new Error(
+        "Cannot cancel a pending subscription. Please wait for payment confirmation or contact support."
+      );
+    }
+
+    return SubscriptionRepository.update(sub.id, {
+      status: SubscriptionStatus.CANCELLED,
+    });
+  }
 }

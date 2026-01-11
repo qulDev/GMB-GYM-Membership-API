@@ -776,6 +776,111 @@
         }
       }
     },
+    "/api/v1/subscriptions/current/cancel": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Cancel current subscription (User)",
+        "description": "Allows authenticated users to cancel their own active subscription. Only ACTIVE subscriptions can be cancelled. PENDING subscriptions require payment completion or support contact. EXPIRED subscriptions cannot be cancelled.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Your subscription has been cancelled successfully"
+                        },
+                        "subscription": {
+                          "$ref": "#/components/schemas/Subscription"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - subscription cannot be cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "BAD_REQUEST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription already canceled"
+                    }
+                  }
+                },
+                "examples": {
+                  "already_cancelled": {
+                    "summary": "Already cancelled",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Subscription already canceled"
+                    }
+                  },
+                  "expired": {
+                    "summary": "Expired subscription",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Cannot cancel an expired subscription"
+                    }
+                  },
+                  "pending": {
+                    "summary": "Pending subscription",
+                    "value": {
+                      "status": "error",
+                      "code": "BAD_REQUEST",
+                      "message": "Cannot cancel a pending subscription. Please wait for payment confirmation or contact support."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - user not authenticated"
+          },
+          "404": {
+            "description": "No active subscription found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/subscriptions/{id}/activate": {
       "post": {
         "tags": ["Subscriptions"],
@@ -830,6 +935,203 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/expire-check": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Trigger subscription expiration check (Admin only)",
+        "description": "Manually triggers a check for expired subscriptions and updates their status to EXPIRED. This is normally run automatically by a cron job every hour.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Expiration check completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription expiration check completed"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "expiredCount": {
+                          "type": "integer",
+                          "example": 5
+                        },
+                        "expiredIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["sub1", "sub2", "sub3"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Expiration check failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription expiration check failed"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Database connection failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin access required"
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/expiring-soon": {
+      "get": {
+        "tags": ["Subscriptions"],
+        "summary": "Get subscriptions expiring soon (Admin only)",
+        "description": "Retrieves a list of active subscriptions that will expire within the specified number of days. Useful for sending reminder notifications to members.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Number of days to look ahead for expiring subscriptions",
+            "schema": {
+              "type": "integer",
+              "default": 7,
+              "minimum": 1,
+              "maximum": 90
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expiring subscriptions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscriptions expiring soon retrieved"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "example": 3
+                        },
+                        "daysAhead": {
+                          "type": "integer",
+                          "example": 7
+                        },
+                        "subscriptions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "sub123"
+                              },
+                              "userId": {
+                                "type": "string",
+                                "example": "user123"
+                              },
+                              "endDate": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2024-02-15T23:59:59.000Z"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "ACTIVE"
+                              },
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "user123"
+                                  },
+                                  "email": {
+                                    "type": "string",
+                                    "example": "member@example.com"
+                                  },
+                                  "fullName": {
+                                    "type": "string",
+                                    "example": "John Doe"
+                                  }
+                                }
+                              },
+                              "membershipPlan": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "plan123"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "Premium Monthly"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin access required"
           }
         }
       }
@@ -1289,6 +1591,200 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResponseMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/{classId}/book": {
+      "post": {
+        "tags": ["Classes"],
+        "summary": "Book a gym class",
+        "description": "Book a spot in a gym class. Requires active subscription.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID to book"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Class booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (class not available, already started)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No active subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Class not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already booked or class is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/{classId}/cancel": {
+      "post": {
+        "tags": ["Classes"],
+        "summary": "Cancel class booking",
+        "description": "Cancel a previously booked class. Can only cancel before class starts.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID to cancel booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (already cancelled, class already started)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/my-bookings": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "Get user's class bookings",
+        "description": "Get all class bookings for the authenticated user",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["CONFIRMED", "CANCELLED"]
+            },
+            "description": "Filter by booking status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's bookings retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBookingList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/{classId}/participants": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "Get class participants (Admin only)",
+        "description": "Get list of users who booked this class",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Participants list retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassParticipants"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Class not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
                 }
               }
             }
@@ -2556,6 +3052,112 @@
             "format": "date-time"
           }
         }
+      },
+      "ClassBooking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "classId": {
+            "type": "string"
+          },
+          "bookedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["CONFIRMED", "CANCELLED"]
+          },
+          "gymClass": {
+            "$ref": "#/components/schemas/GymClass"
+          }
+        }
+      },
+      "ClassParticipant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "classId": {
+            "type": "string"
+          },
+          "bookedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+            }
+          }
+        }
+      },
+      "ResponseClassBooking": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ClassBooking"
+              }
+            }
+          }
+        ]
+      },
+      "ResponseClassBookingList": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ClassBooking"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ResponseClassParticipants": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ClassParticipant"
+                }
+              }
+            }
+          }
+        ]
       },
       "Pagination": {
         "type": "object",

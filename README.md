@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Prisma-7.1.0-orange.svg" alt="Prisma">
   <img src="https://img.shields.io/badge/PostgreSQL-16+-blue.svg" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Redis-7+-red.svg" alt="Redis">
-  <img src="https://img.shields.io/badge/Tests-477%20passing-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-560%20passing-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/License-ISC-yellow.svg" alt="License">
 </p>
 
@@ -339,64 +339,71 @@ http://localhost:3000/api/v1
 
 ### API Endpoints Summary
 
-| Method               | Endpoint                      | Description                   | Auth |
-| -------------------- | ----------------------------- | ----------------------------- | ---- |
+| Method               | Endpoint                        | Description                   | Auth |
+| -------------------- | ------------------------------- | ----------------------------- | ---- |
 | **Authentication**   |
-| POST                 | `/auth/register`              | Register user baru            | ❌   |
-| POST                 | `/auth/login`                 | Login user                    | ❌   |
-| POST                 | `/auth/refresh`               | Refresh access token          | ❌   |
-| POST                 | `/auth/logout`                | Logout user                   | ✅   |
+| POST                 | `/auth/register`                | Register user baru            | ❌   |
+| POST                 | `/auth/login`                   | Login user                    | ❌   |
+| POST                 | `/auth/refresh`                 | Refresh access token          | ❌   |
+| POST                 | `/auth/logout`                  | Logout user                   | ✅   |
 | **Users**            |
-| GET                  | `/users/me`                   | Get profil user saat ini      | ✅   |
-| PUT                  | `/users/me`                   | Update profil user saat ini   | ✅   |
-| GET                  | `/users`                      | List semua user (Admin)       | 👑   |
-| GET                  | `/users/:id`                  | Get user by ID (Admin)        | 👑   |
-| DELETE               | `/users/:id`                  | Hapus user (Admin)            | 👑   |
+| GET                  | `/users/me`                     | Get profil user saat ini      | ✅   |
+| PUT                  | `/users/me`                     | Update profil user saat ini   | ✅   |
+| GET                  | `/users`                        | List semua user (Admin)       | 👑   |
+| GET                  | `/users/:id`                    | Get user by ID (Admin)        | 👑   |
+| DELETE               | `/users/:id`                    | Hapus user (Admin)            | 👑   |
 | **Membership Plans** |
-| GET                  | `/membership-plans`           | List semua plan               | ❌   |
-| GET                  | `/membership-plans/:id`       | Get plan by ID                | ❌   |
-| POST                 | `/membership-plans`           | Buat plan (Admin)             | 👑   |
-| PUT                  | `/membership-plans/:id`       | Update plan (Admin)           | 👑   |
-| DELETE               | `/membership-plans/:id`       | Hapus plan (Admin)            | 👑   |
+| GET                  | `/membership-plans`             | List semua plan               | ❌   |
+| GET                  | `/membership-plans/:id`         | Get plan by ID                | ❌   |
+| POST                 | `/membership-plans`             | Buat plan (Admin)             | 👑   |
+| PUT                  | `/membership-plans/:id`         | Update plan (Admin)           | 👑   |
+| DELETE               | `/membership-plans/:id`         | Hapus plan (Admin)            | 👑   |
 | **Subscriptions**    |
-| GET                  | `/subscriptions`              | Get subscription saya         | ✅   |
-| GET                  | `/subscriptions/current`      | Get subscription aktif        | ✅   |
-| POST                 | `/subscriptions`              | Buat subscription             | ✅   |
-| POST                 | `/subscriptions/:id/activate` | Aktifkan subscription (Admin) | 👑   |
-| POST                 | `/subscriptions/:id/cancel`   | Batalkan subscription (Admin) | 👑   |
+| GET                  | `/subscriptions`                | Get subscription saya         | ✅   |
+| GET                  | `/subscriptions/current`        | Get subscription aktif        | ✅   |
+| POST                 | `/subscriptions`                | Buat subscription             | ✅   |
+| POST                 | `/subscriptions/current/cancel` | Batalkan subscription saya    | ✅   |
+| POST                 | `/subscriptions/:id/activate`   | Aktifkan subscription (Admin) | 👑   |
+| POST                 | `/subscriptions/:id/cancel`     | Batalkan subscription (Admin) | 👑   |
+| GET                  | `/subscriptions/expiring-soon`  | Cek akan expired (Admin)      | 👑   |
+| POST                 | `/subscriptions/expire-check`   | Trigger expire check (Admin)  | 👑   |
 | **Payments**         |
-| GET                  | `/payments`                   | Get riwayat pembayaran        | ✅   |
-| GET                  | `/payments/:id`               | Get detail pembayaran         | ✅   |
-| POST                 | `/payments/:subscriptionId`   | Proses pembayaran             | ✅   |
-| POST                 | `/payments/webhook/midtrans`  | Webhook Midtrans              | ❌   |
+| GET                  | `/payments`                     | Get riwayat pembayaran        | ✅   |
+| GET                  | `/payments/:id`                 | Get detail pembayaran         | ✅   |
+| POST                 | `/payments/:subscriptionId`     | Proses pembayaran             | ✅   |
+| POST                 | `/payments/webhook/midtrans`    | Webhook Midtrans              | ❌   |
 | **Check-In/Out**     |
-| POST                 | `/check-ins`                  | Check in                      | ✅   |
-| POST                 | `/check-ins/:id/checkout`     | Check out                     | ✅   |
-| GET                  | `/check-ins`                  | Get riwayat check-in          | ✅   |
-| GET                  | `/check-ins/current`          | Get status saat ini           | ✅   |
+| POST                 | `/check-ins`                    | Check in                      | ✅   |
+| POST                 | `/check-ins/:id/checkout`       | Check out                     | ✅   |
+| GET                  | `/check-ins`                    | Get riwayat check-in          | ✅   |
+| GET                  | `/check-ins/current`            | Get status saat ini           | ✅   |
 | **Classes**          |
-| GET                  | `/classes`                    | List semua kelas              | ❌   |
-| GET                  | `/classes/:id`                | Get detail kelas              | ❌   |
-| POST                 | `/classes`                    | Buat kelas (Admin)            | 👑   |
-| PUT                  | `/classes/:id`                | Update kelas (Admin)          | 👑   |
-| DELETE               | `/classes/:id`                | Hapus kelas (Admin)           | 👑   |
+| GET                  | `/classes`                      | List semua kelas              | ❌   |
+| GET                  | `/classes/:id`                  | Get detail kelas              | ❌   |
+| POST                 | `/classes`                      | Buat kelas (Admin)            | 👑   |
+| PUT                  | `/classes/:id`                  | Update kelas (Admin)          | 👑   |
+| DELETE               | `/classes/:id`                  | Hapus kelas (Admin)           | 👑   |
+| POST                 | `/classes/:id/book`             | Booking kelas                 | ✅   |
+| POST                 | `/classes/:id/cancel`           | Batalkan booking              | ✅   |
+| GET                  | `/classes/my-bookings`          | Get booking saya              | ✅   |
+| GET                  | `/classes/:id/participants`     | Get peserta (Admin)           | 👑   |
 | **Trainers**         |
-| GET                  | `/trainers`                   | List semua trainer            | ❌   |
-| GET                  | `/trainers/:id`               | Get detail trainer            | ❌   |
-| POST                 | `/trainers`                   | Buat trainer (Admin)          | 👑   |
-| PUT                  | `/trainers/:id`               | Update trainer (Admin)        | 👑   |
-| DELETE               | `/trainers/:id`               | Hapus trainer (Admin)         | 👑   |
+| GET                  | `/trainers`                     | List semua trainer            | ❌   |
+| GET                  | `/trainers/:id`                 | Get detail trainer            | ❌   |
+| POST                 | `/trainers`                     | Buat trainer (Admin)          | 👑   |
+| PUT                  | `/trainers/:id`                 | Update trainer (Admin)        | 👑   |
+| DELETE               | `/trainers/:id`                 | Hapus trainer (Admin)         | 👑   |
 | **Member Dashboard** |
-| GET                  | `/member/dashboard`           | Get dashboard member          | ✅   |
+| GET                  | `/member/dashboard`             | Get dashboard member          | ✅   |
 | **Reports (Admin)**  |
-| GET                  | `/reports/dashboard`          | Statistik dashboard           | 👑   |
-| GET                  | `/reports/revenue`            | Laporan pendapatan            | 👑   |
-| GET                  | `/reports/attendance`         | Laporan kehadiran             | 👑   |
+| GET                  | `/reports/dashboard`            | Statistik dashboard           | 👑   |
+| GET                  | `/reports/revenue`              | Laporan pendapatan            | 👑   |
+| GET                  | `/reports/attendance`           | Laporan kehadiran             | 👑   |
 | **Logs (Admin)**     |
-| GET                  | `/logs`                       | List semua log                | 👑   |
-| GET                  | `/logs/:id`                   | Get log by ID                 | 👑   |
-| POST                 | `/logs`                       | Buat log                      | ✅   |
-| DELETE               | `/logs/:id`                   | Hapus log (Admin)             | 👑   |
+| GET                  | `/logs`                         | List semua log                | 👑   |
+| GET                  | `/logs/:id`                     | Get log by ID                 | 👑   |
+| POST                 | `/logs`                         | Buat log                      | ✅   |
+| DELETE               | `/logs/:id`                     | Hapus log (Admin)             | 👑   |
 
 **Legend:**
 
@@ -436,7 +443,7 @@ npm test -- --watch
 
 ### Test Coverage
 
-Project ini mempertahankan coverage test tinggi dengan **477 test** di **38 test suite**:
+Project ini mempertahankan coverage test tinggi dengan **560 test** di **38 test suite**:
 
 | Category     | Tests | Status |
 | ------------ | ----- | ------ |

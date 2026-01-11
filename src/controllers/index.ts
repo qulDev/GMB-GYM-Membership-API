@@ -2,6 +2,7 @@ export * from "./auth.controller";
 export * from "./user.controller";
 export * from "./membership.controller";
 export * from "./subscription.controller";
+export * from "./subscription-scheduler.controller";
 export * from "./payments.controller";
 export * from "./checkin.controller";
 export * from "./trainer.controller";

@@ -9,6 +9,7 @@ import fs from "fs";
 import { _PORT } from "./secret";
 import rootRoutes from "./routes";
 import { errorHandler, notFoundHandler } from "./middlewares";
+import { startSubscriptionExpirationJob } from "./jobs";
 
 // Load API specification
 const apiSpecPath = path.join(__dirname, "../docs/Api_spec.json");
@@ -60,4 +61,7 @@ app.listen(port, () => {
   console.log(`📍 Health check: http://localhost:${port}/health`);
   console.log(`📍 API Base URL: http://localhost:${port}/api/v1`);
   console.log(`📖 API Docs: http://localhost:${port}/api-docs`);
+
+  // Start cron jobs
+  startSubscriptionExpirationJob();
 });

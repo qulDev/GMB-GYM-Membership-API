@@ -51,6 +51,95 @@ export class SubscriptionRepository {
       data,
     });
   }
+
+  /**
+   * Find all expired subscriptions (ACTIVE but past endDate)
+   */
+  static findExpired() {
+    return prisma.subscription.findMany({
+      where: {
+        status: SubscriptionStatus.ACTIVE,
+        endDate: {
+          lt: new Date(),
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+          },
+        },
+        membershipPlan: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Find subscriptions expiring within specified days
+   */
+  static findExpiringSoon(days: number = 7) {
+    const now = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+
+    return prisma.subscription.findMany({
+      where: {
+        status: SubscriptionStatus.ACTIVE,
+        endDate: {
+          gte: now,
+          lte: futureDate,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+          },
+        },
+        membershipPlan: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { endDate: "asc" },
+    });
+  }
+
+  /**
+   * Bulk expire subscriptions by IDs
+   */
+  static expireMany(ids: string[]) {
+    return prisma.subscription.updateMany({
+      where: {
+        id: { in: ids },
+      },
+      data: {
+        status: SubscriptionStatus.EXPIRED,
+      },
+    });
+  }
+
+  /**
+   * Expire a single subscription
+   */
+  static expire(id: string) {
+    return prisma.subscription.update({
+      where: { id },
+      data: { status: SubscriptionStatus.EXPIRED },
+    });
+  }
+
   static activate(id: string) {
     const start = new Date();
     const end = new Date();

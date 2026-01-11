@@ -3,6 +3,7 @@ export * from "./user.service";
 export * from "./membership.service";
 export * from "./payments.service";
 export * from "./subscription.service";
+export * from "./subscription-scheduler.service";
 export * from "./checkin.service";
 export * from "./trainer.service";
 export * from "./class.service";

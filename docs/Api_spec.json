@@ -834,6 +834,203 @@
         }
       }
     },
+    "/api/v1/subscriptions/expire-check": {
+      "post": {
+        "tags": ["Subscriptions"],
+        "summary": "Trigger subscription expiration check (Admin only)",
+        "description": "Manually triggers a check for expired subscriptions and updates their status to EXPIRED. This is normally run automatically by a cron job every hour.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Expiration check completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription expiration check completed"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "expiredCount": {
+                          "type": "integer",
+                          "example": 5
+                        },
+                        "expiredIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["sub1", "sub2", "sub3"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Expiration check failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscription expiration check failed"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Database connection failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin access required"
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/expiring-soon": {
+      "get": {
+        "tags": ["Subscriptions"],
+        "summary": "Get subscriptions expiring soon (Admin only)",
+        "description": "Retrieves a list of active subscriptions that will expire within the specified number of days. Useful for sending reminder notifications to members.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Number of days to look ahead for expiring subscriptions",
+            "schema": {
+              "type": "integer",
+              "default": 7,
+              "minimum": 1,
+              "maximum": 90
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expiring subscriptions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Subscriptions expiring soon retrieved"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "example": 3
+                        },
+                        "daysAhead": {
+                          "type": "integer",
+                          "example": 7
+                        },
+                        "subscriptions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "sub123"
+                              },
+                              "userId": {
+                                "type": "string",
+                                "example": "user123"
+                              },
+                              "endDate": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2024-02-15T23:59:59.000Z"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "ACTIVE"
+                              },
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "user123"
+                                  },
+                                  "email": {
+                                    "type": "string",
+                                    "example": "member@example.com"
+                                  },
+                                  "fullName": {
+                                    "type": "string",
+                                    "example": "John Doe"
+                                  }
+                                }
+                              },
+                              "membershipPlan": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "plan123"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "Premium Monthly"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - Admin access required"
+          }
+        }
+      }
+    },
     "/api/v1/payments": {
       "get": {
         "tags": ["Payments"],

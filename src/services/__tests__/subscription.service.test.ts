@@ -274,4 +274,87 @@ describe("SubscriptionService", () => {
       ).rejects.toThrow("Subscription already canceled");
     });
   });
+
+  describe("cancelUserSubscription", () => {
+    it("should cancel user's active subscription successfully", async () => {
+      const cancelledSubscription = {
+        ...mockSubscription,
+        status: SubscriptionStatus.CANCELLED,
+      };
+
+      (SubscriptionRepository.findActiveByUser as jest.Mock).mockResolvedValue(
+        mockSubscription
+      );
+      (SubscriptionRepository.update as jest.Mock).mockResolvedValue(
+        cancelledSubscription
+      );
+
+      const result = await SubscriptionService.cancelUserSubscription(
+        "user123"
+      );
+
+      expect(result).toEqual(cancelledSubscription);
+      expect(SubscriptionRepository.findActiveByUser).toHaveBeenCalledWith(
+        "user123"
+      );
+      expect(SubscriptionRepository.update).toHaveBeenCalledWith(
+        "subscription123",
+        {
+          status: SubscriptionStatus.CANCELLED,
+        }
+      );
+    });
+
+    it("should throw error if no active subscription found", async () => {
+      (SubscriptionRepository.findActiveByUser as jest.Mock).mockResolvedValue(
+        null
+      );
+
+      await expect(
+        SubscriptionService.cancelUserSubscription("user123")
+      ).rejects.toThrow("No active subscription found");
+    });
+
+    it("should throw error if subscription already cancelled", async () => {
+      const alreadyCancelled = {
+        ...mockSubscription,
+        status: SubscriptionStatus.CANCELLED,
+      };
+      (SubscriptionRepository.findActiveByUser as jest.Mock).mockResolvedValue(
+        alreadyCancelled
+      );
+
+      await expect(
+        SubscriptionService.cancelUserSubscription("user123")
+      ).rejects.toThrow("Subscription already canceled");
+    });
+
+    it("should throw error if subscription is expired", async () => {
+      const expiredSub = {
+        ...mockSubscription,
+        status: SubscriptionStatus.EXPIRED,
+      };
+      (SubscriptionRepository.findActiveByUser as jest.Mock).mockResolvedValue(
+        expiredSub
+      );
+
+      await expect(
+        SubscriptionService.cancelUserSubscription("user123")
+      ).rejects.toThrow("Cannot cancel an expired subscription");
+    });
+
+    it("should throw error if subscription is pending", async () => {
+      const pendingSub = {
+        ...mockSubscription,
+        status: SubscriptionStatus.PENDING,
+      };
+      (SubscriptionRepository.findActiveByUser as jest.Mock).mockResolvedValue(
+        pendingSub
+      );
+
+      await expect(
+        SubscriptionService.cancelUserSubscription("user123")
+      ).rejects.toThrow("Cannot cancel a pending subscription");
+    });
+  });
 });

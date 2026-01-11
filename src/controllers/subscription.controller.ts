@@ -34,7 +34,9 @@ export class SubscriptionController {
         throw new Error("User is not authenticated");
       }
 
-      const sub = await SubscriptionService.getCurrentSubscription(req.user.userId);
+      const sub = await SubscriptionService.getCurrentSubscription(
+        req.user.userId
+      );
       ResponseHelper.success(res, sub, 200);
     } catch (e) {
       next(e);
@@ -65,6 +67,47 @@ export class SubscriptionController {
       await SubscriptionService.cancelSubscription(req.params.id);
       ResponseHelper.message(res, "Subscription canceled", 200);
     } catch (e) {
+      next(e);
+    }
+  }
+
+  /**
+   * POST /api/v1/subscriptions/current/cancel
+   * User cancels their own active subscription
+   */
+  static async cancelMy(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || !req.user.userId) {
+        ResponseHelper.unauthorized(res, "User is not authenticated");
+        return;
+      }
+
+      const userId = req.user.userId;
+      const cancelledSub = await SubscriptionService.cancelUserSubscription(
+        userId
+      );
+
+      ResponseHelper.success(
+        res,
+        {
+          message: "Your subscription has been cancelled successfully",
+          subscription: cancelledSub,
+        },
+        200
+      );
+    } catch (e: any) {
+      if (e.message === "No active subscription found") {
+        ResponseHelper.notFound(res, e.message);
+        return;
+      }
+      if (
+        e.message === "Subscription already canceled" ||
+        e.message === "Cannot cancel an expired subscription" ||
+        e.message.includes("Cannot cancel a pending subscription")
+      ) {
+        ResponseHelper.error(res, "BAD_REQUEST", e.message, 400);
+        return;
+      }
       next(e);
     }
   }

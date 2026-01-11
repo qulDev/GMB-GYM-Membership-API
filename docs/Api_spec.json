@@ -1296,6 +1296,200 @@
         }
       }
     },
+    "/api/v1/classes/{classId}/book": {
+      "post": {
+        "tags": ["Classes"],
+        "summary": "Book a gym class",
+        "description": "Book a spot in a gym class. Requires active subscription.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID to book"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Class booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (class not available, already started)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No active subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Class not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already booked or class is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/{classId}/cancel": {
+      "post": {
+        "tags": ["Classes"],
+        "summary": "Cancel class booking",
+        "description": "Cancel a previously booked class. Can only cancel before class starts.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID to cancel booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBooking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (already cancelled, class already started)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/my-bookings": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "Get user's class bookings",
+        "description": "Get all class bookings for the authenticated user",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["CONFIRMED", "CANCELLED"]
+            },
+            "description": "Filter by booking status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's bookings retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassBookingList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/classes/{classId}/participants": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "Get class participants (Admin only)",
+        "description": "Get list of users who booked this class",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "classId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Class ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Participants list retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseClassParticipants"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Class not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/trainers": {
       "get": {
         "tags": ["Trainers"],
@@ -2556,6 +2750,112 @@
             "format": "date-time"
           }
         }
+      },
+      "ClassBooking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "classId": {
+            "type": "string"
+          },
+          "bookedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["CONFIRMED", "CANCELLED"]
+          },
+          "gymClass": {
+            "$ref": "#/components/schemas/GymClass"
+          }
+        }
+      },
+      "ClassParticipant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "classId": {
+            "type": "string"
+          },
+          "bookedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+            }
+          }
+        }
+      },
+      "ResponseClassBooking": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ClassBooking"
+              }
+            }
+          }
+        ]
+      },
+      "ResponseClassBookingList": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ClassBooking"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ResponseClassParticipants": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ResponseEnvelope" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ClassParticipant"
+                }
+              }
+            }
+          }
+        ]
       },
       "Pagination": {
         "type": "object",

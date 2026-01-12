@@ -1,22 +1,32 @@
-// routes/api/user.routes.ts
+// routes/api/membership.routes.ts
 import { Router } from "express";
 import { MembershipPlanController } from "../../controllers";
 import { authenticate, authorize } from "../../middlewares";
 
 const membershipRoutes: Router = Router();
 
-// All routes require authentication
-membershipRoutes.use(authenticate);
+// Public routes - users can view plans without authentication
+membershipRoutes.get("/", MembershipPlanController.getAllPlans);
+membershipRoutes.get("/:id", MembershipPlanController.getPlanById);
 
-// Current membership routes
-// membershipRoutes.get("/current", MembershipPlanController.getCurrentMembership);
-
-
-// Admin only routes
-membershipRoutes.get("/", authorize("ADMIN"), MembershipPlanController.getAllPlans);
-membershipRoutes.get("/:id", authorize("ADMIN"), MembershipPlanController.getPlanById);
-membershipRoutes.post("/", authorize("ADMIN"), MembershipPlanController.createPlan);
-membershipRoutes.put("/:id", authorize("ADMIN"), MembershipPlanController.updatePlan);
-membershipRoutes.delete("/:id", authorize("ADMIN"), MembershipPlanController.deletePlan);
+// Admin only routes - require authentication
+membershipRoutes.post(
+  "/",
+  authenticate,
+  authorize("ADMIN"),
+  MembershipPlanController.createPlan
+);
+membershipRoutes.put(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  MembershipPlanController.updatePlan
+);
+membershipRoutes.delete(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  MembershipPlanController.deletePlan
+);
 
 export default membershipRoutes;

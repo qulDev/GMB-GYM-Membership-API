@@ -8,7 +8,7 @@ import path from "path";
 import fs from "fs";
 import { _PORT } from "./secret";
 import rootRoutes from "./routes";
-import { errorHandler, notFoundHandler } from "./middlewares";
+import { errorHandler, notFoundHandler, activityLogger } from "./middlewares";
 import { startSubscriptionExpirationJob } from "./jobs";
 
 // Load API specification
@@ -25,13 +25,16 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 
-// Logging
+// Logging (console)
 app.use(morgan("dev"));
 
-// Body parsing
+// Body parsing - IMPORTANT: webhook route must be before json() middleware
 app.use("/api/v1/payments/webhook/midtrans", express.raw({ type: "*/*" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Activity logging middleware (logs to database)
+app.use(activityLogger);
 
 // Routes
 app.use("/api", rootRoutes);

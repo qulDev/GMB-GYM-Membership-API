@@ -221,7 +221,7 @@ Pastikan Anda telah menginstal:
    # atau
    pnpm install
    ```
-
+ 
 3. **Buat file environment**
    ```bash
    cp .env.example .env

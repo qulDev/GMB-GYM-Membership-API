@@ -51,7 +51,101 @@
             },
             "description": "Register a new user account"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password123!\",\n  \"fullName\": \"Test User\",\n  \"phone\": \"081234567890\",\n  \"dateOfBirth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"address\": \"Jl. Test No. 123\",\n  \"emergencyContact\": \"081234567899\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"usr_abc123def456\",\n      \"email\": \"newuser@example.com\",\n      \"fullName\": \"Test User\",\n      \"phone\": \"081234567890\",\n      \"role\": \"member\",\n      \"createdAt\": \"2026-01-12T10:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - email already exists",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"Password123!\",\n  \"fullName\": \"Test User\",\n  \"phone\": \"081234567890\",\n  \"dateOfBirth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"address\": \"Jl. Test No. 123\",\n  \"emergencyContact\": \"081234567899\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "register"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Email already registered\",\n  \"error\": {\n    \"code\": \"EMAIL_EXISTS\",\n    \"details\": \"The email address is already associated with an existing account\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "register"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    {\n      \"field\": \"email\",\n      \"message\": \"Invalid email format\"\n    },\n    {\n      \"field\": \"password\",\n      \"message\": \"Password must be at least 8 characters\"\n    },\n    {\n      \"field\": \"fullName\",\n      \"message\": \"Full name is required\"\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -94,7 +188,101 @@
             },
             "description": "Login with email and password"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"usr_abc123def456\",\n      \"email\": \"user@example.com\",\n      \"fullName\": \"Test User\",\n      \"role\": \"member\",\n      \"lastLogin\": \"2026-01-12T10:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - invalid credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid email or password\",\n  \"error\": {\n    \"code\": \"INVALID_CREDENTIALS\"\n  }\n}"
+            },
+            {
+              "name": "failed - user not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"nonexistent@example.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid email or password\",\n  \"error\": {\n    \"code\": \"INVALID_CREDENTIALS\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -137,7 +325,70 @@
             },
             "description": "Login as admin user"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@gym.com\",\n  \"password\": \"AdminPassword123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"usr_admin123\",\n      \"email\": \"admin@gym.com\",\n      \"fullName\": \"Admin User\",\n      \"role\": \"admin\",\n      \"lastLogin\": \"2026-01-12T10:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - invalid credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@gym.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid email or password\",\n  \"error\": {\n    \"code\": \"INVALID_CREDENTIALS\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -177,7 +428,70 @@
             },
             "description": "Get new access token using refresh token"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.validRefreshToken...\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/refresh",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "refresh"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Token refreshed successfully\",\n  \"data\": {\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newAccessToken...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newRefreshToken...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - invalid refresh token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"invalid-or-expired-token\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/refresh",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "refresh"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid or expired refresh token\",\n  \"error\": {\n    \"code\": \"INVALID_REFRESH_TOKEN\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -208,7 +522,52 @@
             },
             "description": "Logout and invalidate tokens"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/logout",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "logout"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Logged out successfully\"\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/auth/logout",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "auth", "logout"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -242,7 +601,52 @@
             },
             "description": "Get current user profile"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"usr_abc123def456\",\n    \"email\": \"user@example.com\",\n    \"fullName\": \"Test User\",\n    \"phone\": \"081234567890\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"gender\": \"male\",\n    \"address\": \"Jl. Test No. 123\",\n    \"emergencyContact\": \"081234567899\",\n    \"role\": \"member\",\n    \"createdAt\": \"2026-01-01T10:00:00.000Z\",\n    \"updatedAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "me"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Update My Profile",
@@ -265,7 +669,70 @@
             },
             "description": "Update current user profile"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"Updated Name\",\n  \"phone\": \"081234567891\",\n  \"address\": \"Jl. Updated No. 456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile updated successfully\",\n  \"data\": {\n    \"id\": \"usr_abc123def456\",\n    \"email\": \"user@example.com\",\n    \"fullName\": \"Updated Name\",\n    \"phone\": \"081234567891\",\n    \"address\": \"Jl. Updated No. 456\",\n    \"updatedAt\": \"2026-01-12T10:30:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"invalid\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "me"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    {\n      \"field\": \"phone\",\n      \"message\": \"Invalid phone number format\"\n    }\n  ]\n}"
+            }
+          ]
         },
         {
           "name": "List All Users (Admin)",
@@ -285,7 +752,60 @@
             },
             "description": "List all users (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"users\": [\n      {\n        \"id\": \"usr_abc123\",\n        \"email\": \"user1@example.com\",\n        \"fullName\": \"User One\",\n        \"role\": \"member\",\n        \"createdAt\": \"2026-01-01T10:00:00.000Z\"\n      },\n      {\n        \"id\": \"usr_def456\",\n        \"email\": \"user2@example.com\",\n        \"fullName\": \"User Two\",\n        \"role\": \"member\",\n        \"createdAt\": \"2026-01-02T10:00:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 50,\n      \"totalPages\": 5\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get User by ID (Admin)",
@@ -299,7 +819,52 @@
             },
             "description": "Get user by ID (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/usr_abc123def456",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "usr_abc123def456"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"usr_abc123def456\",\n    \"email\": \"user@example.com\",\n    \"fullName\": \"Test User\",\n    \"phone\": \"081234567890\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"gender\": \"male\",\n    \"address\": \"Jl. Test No. 123\",\n    \"emergencyContact\": \"081234567899\",\n    \"role\": \"member\",\n    \"createdAt\": \"2026-01-01T10:00:00.000Z\",\n    \"updatedAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - user not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/nonexistent_id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "nonexistent_id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"User not found\",\n  \"error\": {\n    \"code\": \"USER_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Delete User (Admin)",
@@ -313,7 +878,52 @@
             },
             "description": "Delete user (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/usr_abc123def456",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "usr_abc123def456"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User deleted successfully\"\n}"
+            },
+            {
+              "name": "failed - user not found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/users/nonexistent_id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "users", "nonexistent_id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"User not found\",\n  \"error\": {\n    \"code\": \"USER_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -332,9 +942,32 @@
               "host": ["{{baseUrl}}"],
               "path": ["{{apiVersion}}", "membership-plans"]
             },
-            "description": "Get all available membership plans"
+            "description": "Get all available membership plans (public - no auth required)"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "membership-plans"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"plan_basic001\",\n      \"name\": \"Basic Plan\",\n      \"description\": \"Basic gym access\",\n      \"duration\": 30,\n      \"price\": 200000,\n      \"features\": [\"Gym access\", \"Locker\"],\n      \"maxCheckInsPerDay\": 1,\n      \"isActive\": true\n    },\n    {\n      \"id\": \"plan_premium002\",\n      \"name\": \"Premium Plan\",\n      \"description\": \"Full access to all facilities\",\n      \"duration\": 30,\n      \"price\": 500000,\n      \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\", \"Sauna\"],\n      \"maxCheckInsPerDay\": 2,\n      \"isActive\": true\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -367,9 +1000,62 @@
                 "{{membershipPlanId}}"
               ]
             },
-            "description": "Get membership plan by ID"
+            "description": "Get membership plan by ID (public - no auth required)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/plan_premium002",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "plan_premium002"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"plan_premium002\",\n    \"name\": \"Premium Plan\",\n    \"description\": \"Full access to all gym facilities\",\n    \"duration\": 30,\n    \"price\": 500000,\n    \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\", \"Sauna\"],\n    \"maxCheckInsPerDay\": 2,\n    \"isActive\": true,\n    \"createdAt\": \"2026-01-01T00:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - plan not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/nonexistent_plan",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "nonexistent_plan"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Membership plan not found\",\n  \"error\": {\n    \"code\": \"PLAN_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Plan (Admin)",
@@ -392,7 +1078,70 @@
             },
             "description": "Create new membership plan (Admin only)"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Premium Plan\",\n  \"description\": \"Full access to all gym facilities\",\n  \"duration\": 30,\n  \"price\": 500000,\n  \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\"],\n  \"maxCheckInsPerDay\": 2,\n  \"isActive\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "membership-plans"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Membership plan created successfully\",\n  \"data\": {\n    \"id\": \"plan_new001\",\n    \"name\": \"Premium Plan\",\n    \"description\": \"Full access to all gym facilities\",\n    \"duration\": 30,\n    \"price\": 500000,\n    \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\"],\n    \"maxCheckInsPerDay\": 2,\n    \"isActive\": true,\n    \"createdAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\",\n  \"price\": -100\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "membership-plans"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    {\n      \"field\": \"name\",\n      \"message\": \"Name is required\"\n    },\n    {\n      \"field\": \"price\",\n      \"message\": \"Price must be a positive number\"\n    },\n    {\n      \"field\": \"duration\",\n      \"message\": \"Duration is required\"\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -435,7 +1184,78 @@
             },
             "description": "Update membership plan (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Premium Plan Updated\",\n  \"price\": 550000\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/plan_premium002",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "plan_premium002"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Membership plan updated successfully\",\n  \"data\": {\n    \"id\": \"plan_premium002\",\n    \"name\": \"Premium Plan Updated\",\n    \"description\": \"Full access to all gym facilities\",\n    \"duration\": 30,\n    \"price\": 550000,\n    \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\"],\n    \"maxCheckInsPerDay\": 2,\n    \"isActive\": true,\n    \"updatedAt\": \"2026-01-12T10:30:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - plan not found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Premium Plan Updated\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/nonexistent_plan",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "nonexistent_plan"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Membership plan not found\",\n  \"error\": {\n    \"code\": \"PLAN_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Delete Plan (Admin)",
@@ -453,7 +1273,60 @@
             },
             "description": "Delete membership plan (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/plan_premium002",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "plan_premium002"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Membership plan deleted successfully\"\n}"
+            },
+            {
+              "name": "failed - plan not found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/membership-plans/nonexistent_plan",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "membership-plans",
+                    "nonexistent_plan"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Membership plan not found\",\n  \"error\": {\n    \"code\": \"PLAN_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -476,7 +1349,52 @@
             },
             "description": "Get current user's subscriptions"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"sub_abc123\",\n      \"userId\": \"usr_abc123def456\",\n      \"membershipPlanId\": \"plan_premium002\",\n      \"membershipPlan\": {\n        \"name\": \"Premium Plan\",\n        \"price\": 500000\n      },\n      \"startDate\": \"2026-01-01T00:00:00.000Z\",\n      \"endDate\": \"2026-01-31T23:59:59.000Z\",\n      \"status\": \"ACTIVE\",\n      \"createdAt\": \"2026-01-01T10:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Current Subscription",
@@ -490,7 +1408,52 @@
             },
             "description": "Get current active subscription"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/current",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "current"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"sub_abc123\",\n    \"userId\": \"usr_abc123def456\",\n    \"membershipPlanId\": \"plan_premium002\",\n    \"membershipPlan\": {\n      \"name\": \"Premium Plan\",\n      \"price\": 500000,\n      \"features\": [\"Full gym access\", \"Group classes\", \"Personal locker\"]\n    },\n    \"startDate\": \"2026-01-01T00:00:00.000Z\",\n    \"endDate\": \"2026-01-31T23:59:59.000Z\",\n    \"status\": \"ACTIVE\",\n    \"daysRemaining\": 19\n  }\n}"
+            },
+            {
+              "name": "failed - no active subscription",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/current",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "current"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"No active subscription found\",\n  \"error\": {\n    \"code\": \"NO_ACTIVE_SUBSCRIPTION\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Subscription",
@@ -513,7 +1476,101 @@
             },
             "description": "Create new subscription"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"membershipPlanId\": \"plan_premium002\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription created successfully\",\n  \"data\": {\n    \"subscription\": {\n      \"id\": \"sub_new123\",\n      \"userId\": \"usr_abc123def456\",\n      \"membershipPlanId\": \"plan_premium002\",\n      \"startDate\": \"2026-01-12T00:00:00.000Z\",\n      \"endDate\": \"2026-02-11T23:59:59.000Z\",\n      \"status\": \"PENDING\",\n      \"createdAt\": \"2026-01-12T10:00:00.000Z\"\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - already has active subscription",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"membershipPlanId\": \"plan_premium002\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"You already have an active subscription\",\n  \"error\": {\n    \"code\": \"ACTIVE_SUBSCRIPTION_EXISTS\"\n  }\n}"
+            },
+            {
+              "name": "failed - plan not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"membershipPlanId\": \"nonexistent_plan\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Membership plan not found\",\n  \"error\": {\n    \"code\": \"PLAN_NOT_FOUND\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -543,7 +1600,62 @@
             },
             "description": "Cancel current active subscription (User)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/current/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "current",
+                    "cancel"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription cancelled successfully\",\n  \"data\": {\n    \"id\": \"sub_abc123\",\n    \"status\": \"CANCELLED\",\n    \"cancelledAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - no active subscription",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/current/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "current",
+                    "cancel"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"No active subscription found\",\n  \"error\": {\n    \"code\": \"NO_ACTIVE_SUBSCRIPTION\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Activate Subscription (Admin)",
@@ -562,7 +1674,62 @@
             },
             "description": "Activate subscription (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/sub_abc123/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "sub_abc123",
+                    "activate"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription activated successfully\",\n  \"data\": {\n    \"id\": \"sub_abc123\",\n    \"status\": \"ACTIVE\",\n    \"activatedAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - subscription not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/nonexistent/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "nonexistent",
+                    "activate"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Subscription not found\",\n  \"error\": {\n    \"code\": \"SUBSCRIPTION_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Cancel Subscription (Admin)",
@@ -581,7 +1748,62 @@
             },
             "description": "Cancel subscription (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/sub_abc123/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "sub_abc123",
+                    "cancel"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription cancelled successfully\",\n  \"data\": {\n    \"id\": \"sub_abc123\",\n    \"status\": \"CANCELLED\",\n    \"cancelledAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - subscription not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/nonexistent/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "subscriptions",
+                    "nonexistent",
+                    "cancel"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Subscription not found\",\n  \"error\": {\n    \"code\": \"SUBSCRIPTION_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Check Expiring Subscriptions (Admin)",
@@ -596,7 +1818,54 @@
             },
             "description": "Get subscriptions expiring soon (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/expiring-soon?days=7",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "expiring-soon"],
+                  "query": [{ "key": "days", "value": "7" }]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"sub_abc123\",\n      \"userId\": \"usr_abc123def456\",\n      \"user\": {\n        \"fullName\": \"Test User\",\n        \"email\": \"user@example.com\"\n      },\n      \"endDate\": \"2026-01-18T23:59:59.000Z\",\n      \"daysRemaining\": 6\n    }\n  ]\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/expiring-soon?days=7",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "expiring-soon"],
+                  "query": [{ "key": "days", "value": "7" }]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Trigger Expire Check (Admin)",
@@ -610,7 +1879,52 @@
             },
             "description": "Manually trigger subscription expiration check (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/expire-check",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "expire-check"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Subscription expiration check completed\",\n  \"data\": {\n    \"expiredCount\": 3,\n    \"processedAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/subscriptions/expire-check",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "subscriptions", "expire-check"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -634,7 +1948,56 @@
             },
             "description": "Get payment history"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"payments\": [\n      {\n        \"id\": \"pay_abc123\",\n        \"subscriptionId\": \"sub_abc123\",\n        \"amount\": 500000,\n        \"status\": \"SUCCESS\",\n        \"paymentMethod\": \"bank_transfer\",\n        \"midtransOrderId\": \"GMB-1736679600000\",\n        \"paidAt\": \"2026-01-12T10:00:00.000Z\",\n        \"createdAt\": \"2026-01-12T09:50:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 5,\n      \"totalPages\": 1\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -664,7 +2027,52 @@
             },
             "description": "Get payment details by ID"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/pay_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "pay_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"pay_abc123\",\n    \"subscriptionId\": \"sub_abc123\",\n    \"subscription\": {\n      \"membershipPlan\": {\n        \"name\": \"Premium Plan\"\n      }\n    },\n    \"amount\": 500000,\n    \"status\": \"SUCCESS\",\n    \"paymentMethod\": \"bank_transfer\",\n    \"midtransOrderId\": \"GMB-1736679600000\",\n    \"midtransTransactionId\": \"txn_abc123\",\n    \"paidAt\": \"2026-01-12T10:00:00.000Z\",\n    \"createdAt\": \"2026-01-12T09:50:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - payment not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/nonexistent",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "nonexistent"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Payment not found\",\n  \"error\": {\n    \"code\": \"PAYMENT_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Process Payment",
@@ -676,9 +2084,95 @@
               "host": ["{{baseUrl}}"],
               "path": ["{{apiVersion}}", "payments", "{{subscriptionId}}"]
             },
-            "description": "Process payment with Midtrans for a subscription"
+            "description": "Process payment with Midtrans for a subscription. Returns snapToken, redirectUrl, and paymentId."
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/sub_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "sub_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Payment initiated successfully\",\n  \"data\": {\n    \"paymentId\": \"pay_new123\",\n    \"midtransOrderId\": \"GMB-1736679600000\",\n    \"snapToken\": \"66e4fa55-fdac-4ef9-91b5-733b97d...\",\n    \"redirectUrl\": \"https://app.sandbox.midtrans.com/snap/v2/vtweb/66e4fa55-fdac-4ef9-91b5-733b97d...\",\n    \"amount\": 500000\n  }\n}"
+            },
+            {
+              "name": "failed - subscription not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/nonexistent",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "nonexistent"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Subscription not found\",\n  \"error\": {\n    \"code\": \"SUBSCRIPTION_NOT_FOUND\"\n  }\n}"
+            },
+            {
+              "name": "failed - already paid",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/sub_paid123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "sub_paid123"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Subscription already has a successful payment\",\n  \"error\": {\n    \"code\": \"ALREADY_PAID\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.status === 'success' && jsonData.data) {",
+                  "    if (jsonData.data.paymentId) {",
+                  "        pm.collectionVariables.set('paymentId', jsonData.data.paymentId);",
+                  "    }",
+                  "    if (jsonData.data.midtransOrderId) {",
+                  "        pm.collectionVariables.set('midtransOrderId', jsonData.data.midtransOrderId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Midtrans Webhook",
@@ -693,16 +2187,79 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"transaction_status\": \"settlement\",\n  \"order_id\": \"ORDER-123\",\n  \"gross_amount\": \"500000.00\",\n  \"payment_type\": \"bank_transfer\"\n}"
+              "raw": "{\n  \"order_id\": \"{{midtransOrderId}}\",\n  \"transaction_status\": \"settlement\",\n  \"status_code\": \"200\",\n  \"gross_amount\": \"500000\",\n  \"fraud_status\": \"accept\",\n  \"transaction_id\": \"test-txn-{{$timestamp}}\",\n  \"payment_type\": \"bank_transfer\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/{{apiVersion}}/payments/webhook/midtrans",
               "host": ["{{baseUrl}}"],
               "path": ["{{apiVersion}}", "payments", "webhook", "midtrans"]
             },
-            "description": "Midtrans payment webhook callback"
+            "description": "Midtrans payment webhook callback. Use the midtransOrderId from the Process Payment response to test this endpoint."
           },
-          "response": []
+          "response": [
+            {
+              "name": "success - payment settlement",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_id\": \"GMB-1736679600000\",\n  \"transaction_status\": \"settlement\",\n  \"status_code\": \"200\",\n  \"gross_amount\": \"500000\",\n  \"fraud_status\": \"accept\",\n  \"transaction_id\": \"txn-abc123\",\n  \"payment_type\": \"bank_transfer\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/webhook/midtrans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "webhook", "midtrans"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Webhook processed successfully\"\n}"
+            },
+            {
+              "name": "failed - invalid order id",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_id\": \"invalid-order-id\",\n  \"transaction_status\": \"settlement\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/payments/webhook/midtrans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "payments", "webhook", "midtrans"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Payment not found for order\",\n  \"error\": {\n    \"code\": \"PAYMENT_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -722,7 +2279,96 @@
             },
             "description": "Check in to gym"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Check-in successful\",\n  \"data\": {\n    \"id\": \"chk_abc123\",\n    \"userId\": \"usr_abc123def456\",\n    \"checkInTime\": \"2026-01-12T10:00:00.000Z\",\n    \"checkOutTime\": null,\n    \"status\": \"CHECKED_IN\"\n  }\n}"
+            },
+            {
+              "name": "failed - no active subscription",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"No active subscription. Please subscribe to check in.\",\n  \"error\": {\n    \"code\": \"NO_ACTIVE_SUBSCRIPTION\"\n  }\n}"
+            },
+            {
+              "name": "failed - already checked in",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"You are already checked in\",\n  \"error\": {\n    \"code\": \"ALREADY_CHECKED_IN\"\n  }\n}"
+            },
+            {
+              "name": "failed - max check-ins reached",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Maximum check-ins per day reached for your plan\",\n  \"error\": {\n    \"code\": \"MAX_CHECKINS_REACHED\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -757,7 +2403,62 @@
             },
             "description": "Check out from gym"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins/chk_abc123/checkout",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "check-ins",
+                    "chk_abc123",
+                    "checkout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Check-out successful\",\n  \"data\": {\n    \"id\": \"chk_abc123\",\n    \"checkInTime\": \"2026-01-12T10:00:00.000Z\",\n    \"checkOutTime\": \"2026-01-12T12:00:00.000Z\",\n    \"duration\": 120,\n    \"status\": \"CHECKED_OUT\"\n  }\n}"
+            },
+            {
+              "name": "failed - not checked in",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins/chk_abc123/checkout",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "check-ins",
+                    "chk_abc123",
+                    "checkout"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Already checked out or invalid check-in\",\n  \"error\": {\n    \"code\": \"INVALID_CHECKOUT\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Check-In History",
@@ -775,7 +2476,52 @@
             },
             "description": "Get check-in history"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"chk_abc123\",\n      \"checkInTime\": \"2026-01-12T10:00:00.000Z\",\n      \"checkOutTime\": \"2026-01-12T12:00:00.000Z\",\n      \"duration\": 120,\n      \"status\": \"CHECKED_OUT\"\n    },\n    {\n      \"id\": \"chk_def456\",\n      \"checkInTime\": \"2026-01-11T09:00:00.000Z\",\n      \"checkOutTime\": \"2026-01-11T11:30:00.000Z\",\n      \"duration\": 150,\n      \"status\": \"CHECKED_OUT\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Current Status",
@@ -789,7 +2535,52 @@
             },
             "description": "Get current check-in status"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success - currently checked in",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins/current",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins", "current"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isCheckedIn\": true,\n    \"checkIn\": {\n      \"id\": \"chk_abc123\",\n      \"checkInTime\": \"2026-01-12T10:00:00.000Z\",\n      \"elapsedMinutes\": 45\n    }\n  }\n}"
+            },
+            {
+              "name": "success - not checked in",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/check-ins/current",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "check-ins", "current"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isCheckedIn\": false,\n    \"checkIn\": null\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -816,7 +2607,30 @@
             },
             "description": "Get all gym classes"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"cls_abc123\",\n      \"name\": \"Morning Yoga\",\n      \"description\": \"Start your day with relaxing yoga\",\n      \"trainer\": {\n        \"id\": \"trn_abc123\",\n        \"name\": \"John Doe\"\n      },\n      \"schedule\": \"2026-01-15T07:00:00.000Z\",\n      \"duration\": 60,\n      \"capacity\": 20,\n      \"bookedCount\": 5,\n      \"availableSpots\": 15,\n      \"type\": \"yoga\",\n      \"status\": \"SCHEDULED\"\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -847,7 +2661,52 @@
             },
             "description": "Get class details by ID"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cls_abc123\",\n    \"name\": \"Morning Yoga\",\n    \"description\": \"Start your day with relaxing yoga\",\n    \"trainer\": {\n      \"id\": \"trn_abc123\",\n      \"name\": \"John Doe\",\n      \"specialization\": [\"yoga\", \"pilates\"]\n    },\n    \"schedule\": \"2026-01-15T07:00:00.000Z\",\n    \"duration\": 60,\n    \"capacity\": 20,\n    \"bookedCount\": 5,\n    \"availableSpots\": 15,\n    \"type\": \"yoga\",\n    \"status\": \"SCHEDULED\"\n  }\n}"
+            },
+            {
+              "name": "failed - class not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/nonexistent",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "nonexistent"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Class not found\",\n  \"error\": {\n    \"code\": \"CLASS_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Class (Admin)",
@@ -870,7 +2729,70 @@
             },
             "description": "Create new gym class (Admin only)"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Morning Yoga\",\n  \"description\": \"Start your day with relaxing yoga\",\n  \"trainerId\": \"trn_abc123\",\n  \"schedule\": \"2026-01-15T07:00:00.000Z\",\n  \"duration\": 60,\n  \"capacity\": 20,\n  \"type\": \"yoga\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Class created successfully\",\n  \"data\": {\n    \"id\": \"cls_new123\",\n    \"name\": \"Morning Yoga\",\n    \"description\": \"Start your day with relaxing yoga\",\n    \"trainerId\": \"trn_abc123\",\n    \"schedule\": \"2026-01-15T07:00:00.000Z\",\n    \"duration\": 60,\n    \"capacity\": 20,\n    \"type\": \"yoga\",\n    \"status\": \"SCHEDULED\",\n    \"createdAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    {\n      \"field\": \"name\",\n      \"message\": \"Name is required\"\n    },\n    {\n      \"field\": \"trainerId\",\n      \"message\": \"Trainer ID is required\"\n    },\n    {\n      \"field\": \"schedule\",\n      \"message\": \"Schedule is required\"\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -909,7 +2831,70 @@
             },
             "description": "Update gym class (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Morning Yoga Updated\",\n  \"capacity\": 25\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Class updated successfully\",\n  \"data\": {\n    \"id\": \"cls_abc123\",\n    \"name\": \"Morning Yoga Updated\",\n    \"capacity\": 25,\n    \"updatedAt\": \"2026-01-12T10:30:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - class not found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/nonexistent",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "nonexistent"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Class not found\",\n  \"error\": {\n    \"code\": \"CLASS_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Delete Class (Admin)",
@@ -923,7 +2908,52 @@
             },
             "description": "Delete gym class (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Class deleted successfully\"\n}"
+            },
+            {
+              "name": "failed - class not found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/nonexistent",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "nonexistent"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Class not found\",\n  \"error\": {\n    \"code\": \"CLASS_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Book Class",
@@ -937,7 +2967,74 @@
             },
             "description": "Book a spot in gym class"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/book",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123", "book"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Class booked successfully\",\n  \"data\": {\n    \"bookingId\": \"bkg_abc123\",\n    \"classId\": \"cls_abc123\",\n    \"className\": \"Morning Yoga\",\n    \"schedule\": \"2026-01-15T07:00:00.000Z\",\n    \"status\": \"CONFIRMED\",\n    \"bookedAt\": \"2026-01-12T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - class full",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_full/book",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_full", "book"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Class is fully booked\",\n  \"error\": {\n    \"code\": \"CLASS_FULL\"\n  }\n}"
+            },
+            {
+              "name": "failed - already booked",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/book",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123", "book"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"You have already booked this class\",\n  \"error\": {\n    \"code\": \"ALREADY_BOOKED\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Cancel Booking",
@@ -951,7 +3048,52 @@
             },
             "description": "Cancel class booking"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123", "cancel"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Booking cancelled successfully\"\n}"
+            },
+            {
+              "name": "failed - no booking found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "cls_abc123", "cancel"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"No booking found for this class\",\n  \"error\": {\n    \"code\": \"BOOKING_NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get My Bookings",
@@ -968,7 +3110,52 @@
             },
             "description": "Get user's class bookings"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/my-bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "my-bookings"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"bkg_abc123\",\n      \"class\": {\n        \"id\": \"cls_abc123\",\n        \"name\": \"Morning Yoga\",\n        \"schedule\": \"2026-01-15T07:00:00.000Z\",\n        \"trainer\": {\n          \"name\": \"John Doe\"\n        }\n      },\n      \"status\": \"CONFIRMED\",\n      \"bookedAt\": \"2026-01-12T10:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/my-bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "classes", "my-bookings"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Participants (Admin)",
@@ -987,7 +3174,62 @@
             },
             "description": "Get class participants (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/participants",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "classes",
+                    "cls_abc123",
+                    "participants"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"class\": {\n      \"id\": \"cls_abc123\",\n      \"name\": \"Morning Yoga\",\n      \"capacity\": 20,\n      \"bookedCount\": 5\n    },\n    \"participants\": [\n      {\n        \"id\": \"usr_abc123\",\n        \"fullName\": \"Test User\",\n        \"email\": \"user@example.com\",\n        \"bookedAt\": \"2026-01-12T10:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/classes/cls_abc123/participants",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "{{apiVersion}}",
+                    "classes",
+                    "cls_abc123",
+                    "participants"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -1013,7 +3255,30 @@
             },
             "description": "Get all trainers"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"trn_abc123\",\n      \"name\": \"John Doe\",\n      \"email\": \"john.trainer@gym.com\",\n      \"phone\": \"081234567890\",\n      \"specialization\": [\"yoga\", \"pilates\"],\n      \"bio\": \"Certified yoga instructor with 5 years experience\",\n      \"certifications\": [\"RYT-200\", \"CPR Certified\"],\n      \"isActive\": true,\n      \"createdAt\": \"2026-01-01T00:00:00.000Z\"\n    },\n    {\n      \"id\": \"trn_def456\",\n      \"name\": \"Jane Smith\",\n      \"email\": \"jane.trainer@gym.com\",\n      \"phone\": \"081234567891\",\n      \"specialization\": [\"cardio\", \"strength\"],\n      \"bio\": \"Personal trainer specializing in weight loss\",\n      \"certifications\": [\"ACE Certified\", \"CPR Certified\"],\n      \"isActive\": true,\n      \"createdAt\": \"2026-01-02T00:00:00.000Z\"\n    }\n  ]\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -1044,7 +3309,52 @@
             },
             "description": "Get trainer details by ID"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"trn_abc123\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.trainer@gym.com\",\n    \"phone\": \"081234567890\",\n    \"specialization\": [\"yoga\", \"pilates\"],\n    \"bio\": \"Certified yoga instructor with 5 years experience\",\n    \"certifications\": [\"RYT-200\", \"CPR Certified\"],\n    \"isActive\": true,\n    \"createdAt\": \"2026-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2026-01-01T00:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_invalid",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_invalid"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Trainer not found\",\n  \"error\": {\n    \"code\": \"NOT_FOUND\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Trainer (Admin)",
@@ -1067,7 +3377,101 @@
             },
             "description": "Add new trainer (Admin only)"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.trainer@gym.com\",\n  \"phone\": \"081234567890\",\n  \"specialization\": [\"yoga\", \"pilates\"],\n  \"bio\": \"Certified yoga instructor with 5 years experience\",\n  \"certifications\": [\"RYT-200\", \"CPR Certified\"],\n  \"isActive\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trainer created successfully\",\n  \"data\": {\n    \"id\": \"trn_new123\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.trainer@gym.com\",\n    \"phone\": \"081234567890\",\n    \"specialization\": [\"yoga\", \"pilates\"],\n    \"bio\": \"Certified yoga instructor with 5 years experience\",\n    \"certifications\": [\"RYT-200\", \"CPR Certified\"],\n    \"isActive\": true,\n    \"createdAt\": \"2026-01-15T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.trainer@gym.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"details\": [\n      {\n        \"field\": \"name\",\n        \"message\": \"Name is required\"\n      },\n      {\n        \"field\": \"email\",\n        \"message\": \"Invalid email format\"\n      }\n    ]\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -1106,7 +3510,101 @@
             },
             "description": "Update trainer (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"specialization\": [\"yoga\", \"pilates\", \"cardio\"]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trainer updated successfully\",\n  \"data\": {\n    \"id\": \"trn_abc123\",\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.trainer@gym.com\",\n    \"phone\": \"081234567890\",\n    \"specialization\": [\"yoga\", \"pilates\", \"cardio\"],\n    \"bio\": \"Certified yoga instructor with 5 years experience\",\n    \"certifications\": [\"RYT-200\", \"CPR Certified\"],\n    \"isActive\": true,\n    \"updatedAt\": \"2026-01-15T12:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - not found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe Updated\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_invalid",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_invalid"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Trainer not found\",\n  \"error\": {\n    \"code\": \"NOT_FOUND\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe Updated\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_abc123"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Delete Trainer (Admin)",
@@ -1120,7 +3618,74 @@
             },
             "description": "Delete trainer (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trainer deleted successfully\"\n}"
+            },
+            {
+              "name": "failed - not found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_invalid",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_invalid"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Trainer not found\",\n  \"error\": {\n    \"code\": \"NOT_FOUND\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/trainers/trn_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "trainers", "trn_abc123"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -1140,7 +3705,52 @@
             },
             "description": "Get personalized member dashboard"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/member/dashboard",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "member", "dashboard"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"profile\": {\n      \"id\": \"usr_abc123\",\n      \"fullName\": \"Test User\",\n      \"email\": \"user@example.com\"\n    },\n    \"subscription\": {\n      \"id\": \"sub_abc123\",\n      \"plan\": {\n        \"name\": \"Premium Monthly\",\n        \"durationInDays\": 30\n      },\n      \"status\": \"ACTIVE\",\n      \"startDate\": \"2026-01-01T00:00:00.000Z\",\n      \"endDate\": \"2026-01-31T23:59:59.000Z\",\n      \"daysRemaining\": 16\n    },\n    \"checkInStats\": {\n      \"totalCheckIns\": 15,\n      \"thisMonth\": 10,\n      \"lastCheckIn\": \"2026-01-14T08:00:00.000Z\"\n    },\n    \"upcomingClasses\": [\n      {\n        \"id\": \"bkg_abc123\",\n        \"class\": {\n          \"name\": \"Morning Yoga\",\n          \"schedule\": \"2026-01-16T07:00:00.000Z\",\n          \"trainer\": {\n            \"name\": \"John Doe\"\n          }\n        }\n      }\n    ],\n    \"recentPayments\": [\n      {\n        \"id\": \"pay_abc123\",\n        \"amount\": 500000,\n        \"status\": \"SUCCESS\",\n        \"paidAt\": \"2026-01-01T10:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "failed - unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/member/dashboard",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "member", "dashboard"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized - No token provided\",\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -1160,7 +3770,52 @@
             },
             "description": "Get dashboard statistics"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/dashboard",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "dashboard"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalMembers\": 150,\n    \"activeMembers\": 120,\n    \"newMembersThisMonth\": 15,\n    \"totalRevenue\": 75000000,\n    \"revenueThisMonth\": 12500000,\n    \"activeSubscriptions\": 110,\n    \"expiringSubscriptions\": 8,\n    \"totalCheckInsToday\": 45,\n    \"totalClasses\": 25,\n    \"upcomingClasses\": 10,\n    \"totalTrainers\": 8\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/dashboard",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "dashboard"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Revenue Report",
@@ -1178,7 +3833,60 @@
             },
             "description": "Get revenue report"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/revenue?startDate=2026-01-01&endDate=2026-01-31",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "revenue"],
+                  "query": [
+                    { "key": "startDate", "value": "2026-01-01" },
+                    { "key": "endDate", "value": "2026-01-31" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"period\": {\n      \"startDate\": \"2026-01-01\",\n      \"endDate\": \"2026-01-31\"\n    },\n    \"summary\": {\n      \"totalRevenue\": 12500000,\n      \"totalTransactions\": 25,\n      \"averageTransaction\": 500000\n    },\n    \"byPlan\": [\n      {\n        \"planName\": \"Premium Monthly\",\n        \"revenue\": 7500000,\n        \"count\": 15\n      },\n      {\n        \"planName\": \"Basic Monthly\",\n        \"revenue\": 5000000,\n        \"count\": 10\n      }\n    ],\n    \"byDay\": [\n      {\n        \"date\": \"2026-01-01\",\n        \"revenue\": 1500000,\n        \"count\": 3\n      },\n      {\n        \"date\": \"2026-01-02\",\n        \"revenue\": 1000000,\n        \"count\": 2\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/revenue?startDate=2026-01-01&endDate=2026-01-31",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "revenue"],
+                  "query": [
+                    { "key": "startDate", "value": "2026-01-01" },
+                    { "key": "endDate", "value": "2026-01-31" }
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Attendance Report",
@@ -1196,7 +3904,56 @@
             },
             "description": "Get attendance report"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/attendance?startDate=2026-01-01&endDate=2026-01-31",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "attendance"],
+                  "query": [
+                    { "key": "startDate", "value": "2026-01-01" },
+                    { "key": "endDate", "value": "2026-01-31" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"period\": {\n      \"startDate\": \"2026-01-01\",\n      \"endDate\": \"2026-01-31\"\n    },\n    \"summary\": {\n      \"totalCheckIns\": 450,\n      \"uniqueMembers\": 85,\n      \"averageDaily\": 15,\n      \"peakDay\": \"Monday\",\n      \"peakHour\": \"18:00\"\n    },\n    \"byDay\": [\n      {\n        \"date\": \"2026-01-01\",\n        \"checkIns\": 20\n      },\n      {\n        \"date\": \"2026-01-02\",\n        \"checkIns\": 18\n      }\n    ],\n    \"byHour\": [\n      {\n        \"hour\": \"06:00\",\n        \"count\": 15\n      },\n      {\n        \"hour\": \"07:00\",\n        \"count\": 25\n      },\n      {\n        \"hour\": \"18:00\",\n        \"count\": 45\n      }\n    ],\n    \"topMembers\": [\n      {\n        \"id\": \"usr_abc123\",\n        \"fullName\": \"Test User\",\n        \"checkIns\": 20\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/reports/attendance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "reports", "attendance"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -1225,7 +3982,56 @@
             },
             "description": "Get system logs"
           },
-          "response": [],
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"logs\": [\n      {\n        \"id\": \"log_abc123\",\n        \"action\": \"USER_LOGIN\",\n        \"entity\": \"AUTH\",\n        \"description\": \"User logged in successfully\",\n        \"level\": \"INFO\",\n        \"userId\": \"usr_abc123\",\n        \"ipAddress\": \"192.168.1.1\",\n        \"userAgent\": \"Mozilla/5.0...\",\n        \"createdAt\": \"2026-01-15T10:00:00.000Z\"\n      },\n      {\n        \"id\": \"log_def456\",\n        \"action\": \"SUBSCRIPTION_CREATED\",\n        \"entity\": \"SUBSCRIPTION\",\n        \"description\": \"New subscription created\",\n        \"level\": \"INFO\",\n        \"userId\": \"usr_abc123\",\n        \"createdAt\": \"2026-01-15T09:30:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"totalItems\": 150,\n      \"totalPages\": 15\n    }\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ],
           "event": [
             {
               "listen": "test",
@@ -1255,7 +4061,74 @@
             },
             "description": "Get log by ID"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"log_abc123\",\n    \"action\": \"USER_LOGIN\",\n    \"entity\": \"AUTH\",\n    \"description\": \"User logged in successfully\",\n    \"level\": \"INFO\",\n    \"userId\": \"usr_abc123\",\n    \"user\": {\n      \"fullName\": \"Test User\",\n      \"email\": \"user@example.com\"\n    },\n    \"ipAddress\": \"192.168.1.1\",\n    \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\",\n    \"metadata\": {\n      \"browser\": \"Chrome\",\n      \"os\": \"Windows 10\"\n    },\n    \"createdAt\": \"2026-01-15T10:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - not found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_invalid",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_invalid"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Log not found\",\n  \"error\": {\n    \"code\": \"NOT_FOUND\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_abc123"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Log",
@@ -1278,7 +4151,101 @@
             },
             "description": "Create log entry"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"TEST_ACTION\",\n  \"entity\": \"TEST\",\n  \"description\": \"Test log entry\",\n  \"level\": \"INFO\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Log created successfully\",\n  \"data\": {\n    \"id\": \"log_new123\",\n    \"action\": \"TEST_ACTION\",\n    \"entity\": \"TEST\",\n    \"description\": \"Test log entry\",\n    \"level\": \"INFO\",\n    \"createdAt\": \"2026-01-15T12:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "failed - validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation error\",\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"details\": [\n      {\n        \"field\": \"action\",\n        \"message\": \"Action is required\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"TEST_ACTION\",\n  \"entity\": \"TEST\",\n  \"description\": \"Test log entry\",\n  \"level\": \"INFO\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Delete Log",
@@ -1292,7 +4259,74 @@
             },
             "description": "Delete log (Admin only)"
           },
-          "response": []
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Log deleted successfully\"\n}"
+            },
+            {
+              "name": "failed - not found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_invalid",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_invalid"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Log not found\",\n  \"error\": {\n    \"code\": \"NOT_FOUND\"\n  }\n}"
+            },
+            {
+              "name": "failed - forbidden (not admin)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/{{apiVersion}}/logs/log_abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["{{apiVersion}}", "logs", "log_abc123"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Forbidden - Admin access required\",\n  \"error\": {\n    \"code\": \"FORBIDDEN\"\n  }\n}"
+            }
+          ]
         }
       ]
     }
